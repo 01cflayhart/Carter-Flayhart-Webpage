@@ -71,7 +71,7 @@ function updateFreshness() {
   $("#player-count").textContent = num(meta.player_count);
   $("#match-count").textContent = num(meta.match_count);
   $("#official-date").textContent = fmtDate(meta.ranking_date);
-  $('#official-caption').textContent=meta.official_rankings_available===false?'Not supplied by the open CSV':state.tour+' edition used for display';
+  $('#official-caption').innerHTML=meta.official_rankings_available===false?`Not in feed · <a href="${state.tour==='ATP'?'https://www.atptour.com/en/rankings/singles':'https://www.wtatennis.com/rankings/singles'}" target="_blank" rel="noreferrer">Official ${state.tour} rankings ↗</a>`:state.tour+' edition used for display';
   const official=$('#basis option[value="atp"]');official.textContent='Historical '+state.tour+' rank*';official.disabled=meta.official_rankings_available===false;
   $('#source-credit').innerHTML=`Data: <a href="${safeURL(meta.source.url)}" target="_blank" rel="noreferrer">${esc(meta.source.name)}</a> · <a href="${safeURL(meta.source.license_url)}" target="_blank" rel="noreferrer">${esc(meta.source.license)}</a>`;
   $('#comparison-note').textContent='* '+state.tour+' only. Categories use pre-date '+(state.basis==='power'?'power':'official')+' ranks; similar = ±25. '+(meta.official_rankings_available===false?'Official ranks/points and age metadata are absent from this feed. ':'')+'Click a player for the full story.';

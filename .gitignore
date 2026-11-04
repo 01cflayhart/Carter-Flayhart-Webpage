@@ -13,3 +13,8 @@ playwright-report/
 data/current/
 _site/
 .website-publish/
+.cortexkit/
+.opencode/
+data/health.json
+data/photos.json
+reports/
