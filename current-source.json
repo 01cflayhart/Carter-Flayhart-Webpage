@@ -1,0 +1,9 @@
+{
+  "name": "Valuebetennis open singles results",
+  "url": "https://www.valuebetennis.com/donnees.htm",
+  "base_url": "https://www.valuebetennis.com/datasets",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "first_year": 2024,
+  "live": true
+}

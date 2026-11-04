@@ -1,0 +1,20 @@
+{
+  "source": {
+    "name": "Jeff Sackmann / Tennis Abstract · Aneeshers archive",
+    "base_url": "https://raw.githubusercontent.com/Aneeshers/tennis-sackmann-archive/83733587353df8a41f2fd4f516147d5aa83f5a8d/atp",
+    "revision": "83733587353df8a41f2fd4f516147d5aa83f5a8d",
+    "profile": "sackmann",
+    "min_ranking_rows": 1000,
+    "excluded_ranking_editions": {"2026-03-30": "Pinned archive contains only ranks 1–700; incomplete edition quarantined after inspection."},
+    "years": [2024, 2025, 2026],
+    "families": {"Tour": "atp_matches_{year}.csv", "Qualifying / Challenger": "atp_matches_qual_chall_{year}.csv", "ITF": "atp_matches_futures_{year}.csv"},
+    "rankings": ["atp_rankings_current.csv"],
+    "documents": ["UPSTREAM_README.md"],
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "url": "https://github.com/Aneeshers/tennis-sackmann-archive",
+    "live": false
+  },
+  "rating": {"baseline": 1250, "half_life_days": 120, "k": 40, "anchor_k": 24, "form_weight": 0.35, "surface_blend_matches": 12, "similar_band": 25, "extra_impact": false, "include_team": true, "retirement_weight": 0.5},
+  "tour": "ATP"
+}

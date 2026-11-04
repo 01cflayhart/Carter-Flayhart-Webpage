@@ -1,0 +1,14 @@
+{
+  "name": "court-current",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Optional browser verification tools; the application itself runs on Python's standard library.",
+  "scripts": {
+    "test": "playwright test",
+    "test:python": "python3 -m unittest discover -v"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1"
+  }
+}

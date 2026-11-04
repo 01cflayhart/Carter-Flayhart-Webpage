@@ -1,0 +1,31 @@
+const {test,expect}=require('@playwright/test');
+const AxeBuilder=require('@axe-core/playwright').default;
+test('personal website and sports navigation are accessible',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
+ await expect(page.getByRole('heading',{level:1})).toContainText('Carter');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+ await page.screenshot({path:'/tmp/opencode/carter-website-'+info.project.name+'.png',fullPage:true});
+ await page.getByRole('navigation').getByRole('link',{name:'Sports Analysis'}).click();
+ await expect(page.locator('#ATP-status')).toContainText('players');
+ await expect(page.locator('#WTA-status')).toContainText('players');
+ expect(errors).toEqual([]);
+});
+test('static Pages ATP/WTA work without a Python API and remain isolated',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/sports/tennis/?tour=ATP');await expect(page.locator('#table-body tr')).toHaveCount(25);
+ await expect(page.locator('#freshness')).toContainText('Separate ATP');
+ await page.locator('#search').fill('Sinner');await expect(page.locator('#table-body tr')).toHaveCount(1);
+ await page.getByRole('button',{name:'Open Jannik Sinner notebook'}).click();await expect(page.locator('#player-title')).toHaveText('Jannik Sinner');
+ await page.locator('#result-mode').selectOption('0');await expect(page.locator('.match-card').first()).toBeVisible();
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+ await page.keyboard.press('Escape');await page.locator('#wta').click();await expect(page.locator('#freshness')).toContainText('Separate WTA');
+ await expect(page.locator('#table-body tr')).toHaveCount(25);await expect(page.locator('#table-body')).not.toContainText('Jannik Sinner');
+ await page.locator('[data-surface="Clay"]').click();await expect(page.locator('#result-count')).toContainText('Clay');
+ await page.locator('#window').selectOption('recent');await expect(page.locator('#result-count')).toContainText('3-month');
+ await page.locator('#filter-toggle').click();await page.locator('#no-ret').check();await page.locator('#expanded').check();await expect(page.locator('#table-head')).toContainText('vs similar');
+ await page.locator('#coverage-open').click();await expect(page.locator('#info-content')).toContainText('CC BY 4.0');await page.keyboard.press('Escape');
+ await page.locator('#method-open').click();await expect(page.locator('#info-content')).toContainText('not hidden');await page.keyboard.press('Escape');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.screenshot({path:'/tmp/opencode/pages-tennis-'+info.project.name+'.png'});expect(errors).toEqual([]);
+});

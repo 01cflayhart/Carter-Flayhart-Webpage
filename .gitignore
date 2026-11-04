@@ -1,0 +1,15 @@
+__pycache__/
+data/raw/
+data/*.sqlite*
+data/snapshot.json
+data/status.json
+data/update.lock
+data/*.tmp
+reports/*.json
+node_modules/
+test-results/
+playwright-report/
+*.log
+data/current/
+_site/
+.website-publish/
