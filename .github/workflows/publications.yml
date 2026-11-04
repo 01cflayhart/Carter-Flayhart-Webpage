@@ -1,0 +1,50 @@
+name: Refresh SciX publications
+on:
+  schedule:
+    - cron: '11 8 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: publications-refresh
+  cancel-in-progress: false
+jobs:
+  publications:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test publication filtering and deduplication
+        run: python -m unittest tests.test_publications -v
+      - name: Check API connection
+        id: connection
+        env:
+          ADS_API_TOKEN: ${{ secrets.ADS_API_TOKEN }}
+        run: |
+          if [ -n "$ADS_API_TOKEN" ]; then
+            echo 'connected=true' >> "$GITHUB_OUTPUT"
+          else
+            echo '::warning::Add ADS_API_TOKEN to repository secrets to activate automatic publication updates. The checked-in snapshot remains unchanged.'
+          fi
+      - name: Retrieve all records and refresh the static list
+        if: steps.connection.outputs.connected == 'true'
+        env:
+          ADS_API_TOKEN: ${{ secrets.ADS_API_TOKEN }}
+        run: python -m publications.update
+      - name: Commit the validated snapshot and publish
+        if: steps.connection.outputs.connected == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add site/index.html site/publications.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh SciX publication list and citation counts'
+            git push
+            gh workflow run pages.yml --ref main
+          fi

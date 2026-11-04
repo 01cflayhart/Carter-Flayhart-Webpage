@@ -9,7 +9,55 @@ test('personal website and sports navigation are accessible',async({page},info)=
  await page.getByRole('navigation').getByRole('link',{name:'Sports Analysis'}).click();
  await expect(page.locator('#ATP-status')).toContainText('players');
  await expect(page.locator('#WTA-status')).toContainText('players');
- expect(errors).toEqual([]);
+  expect(errors).toEqual([]);
+ });
+test('academic profile sections, history, and deep links work',async({page})=>{
+ await page.goto('/');
+ const nav=page.getByRole('navigation',{name:'Main navigation'});
+ await expect(nav.getByRole('link')).toHaveText(['About Me','Research','Publications','Talks & Conferences','Sports Analysis','Hobbies']);
+ await expect(page.locator('.profile-details')).toHaveText('Graduate Student • Rochester Institute of Technology');
+ await expect(page.locator('.profile-intro')).toHaveText('I am an astrophysics graduate student working on high redshift galaxy evolution, focusing on quiescent galaxies, utilizing the COSMOS-Web dataset.');
+ for(const [label,id] of [['Research','research'],['Publications','publications'],['Talks & Conferences','talks'],['Hobbies','hobbies'],['About Me','about']]){
+  await nav.getByRole('link',{name:label,exact:true}).click();
+  await expect(page.locator('#'+id)).toBeVisible();
+  await expect(page.locator('.content-section:visible')).toHaveCount(1);
+  await expect(page.locator('.profile-header')).toBeInViewport();
+  await expect(nav.getByRole('link',{name:label,exact:true})).toHaveAttribute('aria-current','page');
+ }
+ await page.goBack();await expect(page.locator('#hobbies')).toBeVisible();
+ await page.goto('/#research');await expect(page.locator('#research')).toBeVisible();
+ await expect(page.locator('.profile-header')).toBeInViewport();
+ await expect(page.locator('.research-image img')).toBeVisible();
+ expect(await page.locator('.research-image img').evaluate(img=>img.complete&&img.naturalWidth>0)).toBeTruthy();
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+ await page.goto('/sports/');await nav.getByRole('link',{name:'Publications',exact:true}).click();
+ await expect(page.locator('#publications')).toBeVisible();
+});
+test('publications are paper-only, deduplicated, and citation-ranked',async({page})=>{
+ await page.goto('/#publications');
+ const publications=page.locator('#publications');
+ await expect(publications).toBeVisible();
+ await expect(page.locator('.profile-header')).toBeInViewport();
+ const snapshot=require('../../site/publications.json');
+ const items=await publications.locator('.publication').evaluateAll(els=>els.map(el=>({id:el.dataset.bibcode,citations:Number(el.dataset.citations),text:el.textContent})));
+ expect(items.length).toBeGreaterThan(0);
+ expect(new Set(items.map(i=>i.id)).size).toBe(items.length);
+ const coauthors=await publications.locator('h3:has-text("Co-authored papers") + ol .publication').evaluateAll(els=>els.map(el=>Number(el.dataset.citations)));
+ expect(coauthors).toEqual([...coauthors].sort((a,b)=>b-a));
+ const types=new Map(snapshot.records.map(d=>[d.bibcode,d.doctype]));
+ expect(items.every(i=>['article','eprint'].includes(types.get(i.id)))).toBeTruthy();
+ await expect(publications.locator('time')).toHaveAttribute('datetime',snapshot.checked_at.slice(0,10));
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.screenshot({path:'/tmp/opencode/carter-publications.png',fullPage:true});
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+});
+test('academic site remains usable without JavaScript',async({browser,baseURL})=>{
+ const context=await browser.newContext({javaScriptEnabled:false});
+ const page=await context.newPage();await page.goto(baseURL+'/');
+ await expect(page.locator('.content-section:visible')).toHaveCount(5);
+ await page.getByRole('navigation').getByRole('link',{name:'Research',exact:true}).click();
+ await expect(page).toHaveURL(/#research$/);
+ await context.close();
 });
 test('static Pages ATP/WTA work without a Python API and remain isolated',async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));

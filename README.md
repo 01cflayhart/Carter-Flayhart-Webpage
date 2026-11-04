@@ -1,6 +1,7 @@
 # Carter Flayhart — personal website & Court Current
 
-Personal homepage, a Sports Analysis section, and **completely separate ATP and
+Academic personal website with About Me, Research, Publications, Talks & Conferences,
+Sports Analysis, and Hobbies, plus **completely separate ATP and
 WTA singles power rankings**, designed for free GitHub Pages hosting.
 
 - Repository: https://github.com/01cflayhart/Carter-Flayhart-Webpage
@@ -89,6 +90,8 @@ Browser tests require current snapshots (`tennis.current`) and exported assets
 | `current-source.json` | Open feed attribution and temporal scope |
 | `.github/workflows/pages.yml` | Scheduled testing, data refresh and deployment |
 | `docs/PUBLIC_SITE.md` | Hosting, domain, data license and official-rank dependencies |
+| `docs/PERSONAL_SITE.md` | Personal page content, portrait placeholder, and COSMOS-Web image attribution |
+| `publications/update.py` | Supported SciX API refresh, papers-only filtering, deduplication, and publication ordering |
 
 The original June ATP archive tooling remains available separately for reproducible
 historical research. It is **not** mixed into the public current-results pipeline.
