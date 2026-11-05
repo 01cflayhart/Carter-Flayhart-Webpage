@@ -1,9 +1,10 @@
 :root {
-  --paper: #f6f3ed;
-  --ink: #293139;
-  --muted: #61666b;
-  --accent: #315c70;
-  --line: #d7d4ce;
+  color-scheme: dark;
+  --paper: #28343e;
+  --ink: #e0dfd8;
+  --muted: #b4bec1;
+  --accent: #b8d2dd;
+  --line: #53616a;
   --serif: Georgia, 'Times New Roman', serif;
   --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
@@ -12,14 +13,13 @@ body { margin: 0; color: var(--ink); font: 1rem/1.75 var(--sans); background: #1
 body::before { content: ''; position: fixed; inset: 0; z-index: -1; background: linear-gradient(#0c152440, #0c152459), url('./assets/cosmos-web.jpg') center/cover no-repeat; }
 a { color: var(--accent); text-underline-offset: .2em; }
 a:hover { text-decoration-thickness: 2px; }
-:focus-visible { outline: 3px solid #8a4d2d; outline-offset: 5px; }
+:focus-visible { outline: 3px solid #deb68c; outline-offset: 5px; }
 [hidden] { display: none !important; }
 .skip { position: fixed; top: -100px; left: 16px; z-index: 20; padding: 10px 16px; background: var(--paper); }
 .skip:focus { top: 12px; }
-.site-shell { width: min(1000px, calc(100% - 80px)); margin: 64px auto 20px; background: var(--paper); box-shadow: 0 12px 70px #0005; border-radius: 5px; }
+.site-shell { width: min(1000px, calc(100% - 80px)); margin: 64px auto 20px; background: rgb(40 52 62 / .94); backdrop-filter: blur(18px) saturate(.7); box-shadow: 0 12px 70px #0004; border: 1px solid #81919a40; border-radius: 5px; }
 .profile-header { display: flex; align-items: center; gap: 34px; padding: 40px 48px 32px; background: var(--paper); border-radius: 5px 5px 0 0; }
-.portrait-placeholder { width: 142px; height: 158px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #e5e2da; border: 1px solid #d0cec6; border-radius: 3px; color: #626766; }
-.portrait-placeholder { color: #535957; }
+.portrait-placeholder { width: 142px; height: 158px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #35434c; border: 1px solid #657178; border-radius: 3px; color: #bec7c7; }
 .portrait-placeholder span { font: 2.7rem var(--serif); letter-spacing: .02em; }
 .portrait-placeholder small { font-size: .68rem; margin-top: 10px; }
 h1 { margin: 0 0 3px; font: normal clamp(2rem, 4vw, 2.8rem)/1.2 var(--serif); letter-spacing: -.025em; }
@@ -28,8 +28,8 @@ h1 a { color: var(--ink); text-decoration: none; }
 .profile-intro { margin: 6px 0 9px; font-size: .9rem; color: var(--muted); max-width: 630px; }
 .profile-link { font-size: .82rem; }
 .section-nav { display: flex; flex-wrap: wrap; gap: 0 24px; padding: 0 48px; border-bottom: 1px solid var(--line); background: var(--paper); }
-.section-nav a { padding: 14px 0 12px; color: #535b60; font-size: .82rem; white-space: nowrap; text-decoration: none; border-bottom: 3px solid transparent; }
-.section-nav a:hover { color: var(--accent); border-color: #aebfc5; }
+.section-nav a { padding: 14px 0 12px; color: var(--muted); font-size: .82rem; white-space: nowrap; text-decoration: none; border-bottom: 3px solid transparent; }
+.section-nav a:hover { color: var(--accent); border-color: #84969f; }
 .section-nav a[aria-current] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
 main { padding: 34px 48px 42px; min-height: 310px; }
 .content-section { max-width: 760px; scroll-margin-top: 24px; }
@@ -40,7 +40,7 @@ h3 { font-size: 1.07rem; line-height: 1.4; font-weight: 600; margin: 26px 0 8px;
 p { margin: 0 0 17px; }
 .opening { font: 1.3rem/1.5 var(--serif); margin-bottom: 16px; }
 .editorial-note { color: var(--muted); font-size: .9rem; }
-.image-note { margin-top: 32px; padding: 20px 24px; background: #eeebe4; border-left: 2px solid #acb7b8; font-size: .86rem; }
+.image-note { margin-top: 32px; padding: 20px 24px; background: #34424c; border-left: 2px solid #849296; font-size: .86rem; }
 .note-heading { font-weight: 600; }
 .image-note p { margin: 6px 0 8px; }
 .research-image { margin: 30px 0 0; }
@@ -50,7 +50,6 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 .background-credit { width: min(1000px, calc(100% - 80px)); margin: 0 auto 30px; padding: 9px 13px; background: #101820e8; color: #d2d8de; font-size: .65rem; line-height: 1.65; border-radius: 3px; }
 .background-credit a { color: #e2e8ed; }
 .tour-list { margin-top: 28px; }
-.publication-intro { font-size: .93rem; }
 .publication-updated { color: var(--muted); font-size: .77rem; }
 .publication-list { list-style: none; padding: 0; margin: 14px 0 28px; }
 .publication { padding: 22px 0; border-bottom: 1px solid var(--line); }

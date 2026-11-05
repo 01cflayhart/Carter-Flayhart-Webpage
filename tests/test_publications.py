@@ -57,6 +57,13 @@ class PublicationsTests(unittest.TestCase):
         self.assertIn('not peer reviewed', result)
         self.assertIn('<strong>Flayhart, Carter B.</strong>', result)
 
+    def test_render_omits_removed_explanatory_notes(self):
+        result = render({'records': [paper()], 'checked_at': '2026-11-05T00:00:00+00:00'})
+        self.assertNotIn('Articles and preprints, with each paper listed once.', result)
+        self.assertNotIn('Citation counts are a dated SciX snapshot', result)
+        self.assertIn('SciX / NASA ADS', result)
+        self.assertIn('Co-authored papers', result)
+
     def test_pagination_and_api_auth(self):
         requests = []
         def opener(request, timeout):

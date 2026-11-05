@@ -5,6 +5,10 @@ They use `site/site.css`; `site/site.js` progressively enhances the homepage's
 hash links into section switching. With JavaScript disabled, all sections display.
 Sports Analysis keeps its existing URL and dashboard/data pipeline.
 
+The profile and content use a muted slate palette with a lightly translucent,
+blurred content layer over the COSMOS-Web background, rather than a bright paper
+panel. Text, links, and focus indicators retain accessible contrast.
+
 ## Content awaiting Carter
 
 - Portrait (replace the labelled initials placeholder in both profile headers).
@@ -40,6 +44,13 @@ document types, titles, journal information, identifiers, and dates.
 The initial snapshot was retrieved directly from SciX on 4 November 2026:
 19 records, 14 papers. The omitted five were two catalogues, two HST proposals,
 and a master's thesis; no first-author article/preprint was in that selection.
+
+The authenticated GitHub updater was tested successfully on 5 November 2026:
+19 records fetched, 14 papers selected, snapshot committed, and Pages dispatched
+([workflow run](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42107515300)).
+The API token stays in the repository's Actions secrets, never in public assets.
+The publication source/date line remains; explanatory introduction and exclusion
+notes are intentionally omitted from generated HTML at Carter's request.
 
 ### Activate the daily updater
 

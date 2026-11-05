@@ -36,7 +36,9 @@ test('academic profile sections, history, and deep links work',async({page})=>{
 test('publications are paper-only, deduplicated, and citation-ranked',async({page})=>{
  await page.goto('/#publications');
  const publications=page.locator('#publications');
- await expect(publications).toBeVisible();
+  await expect(publications).toBeVisible();
+  await expect(publications).not.toContainText('Articles and preprints, with each paper listed once.');
+  await expect(publications).not.toContainText('Citation counts are a dated SciX snapshot');
  await expect(page.locator('.profile-header')).toBeInViewport();
  const snapshot=require('../../site/publications.json');
  const items=await publications.locator('.publication').evaluateAll(els=>els.map(el=>({id:el.dataset.bibcode,citations:Number(el.dataset.citations),text:el.textContent})));

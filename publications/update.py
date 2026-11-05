@@ -127,12 +127,10 @@ def render(snapshot):
     first = [d for d in papers if d['first_author']]
     rest = [d for d in papers if not d['first_author']]
     date = snapshot['checked_at'][:10]
-    return ('\n<p class="publication-intro">Articles and preprints, with each paper listed once. First-author papers appear first; other papers are ordered by citation count.</p>\n'
-            f'<p class="publication-updated">Source: <a href="{html.escape(SEARCH_URL, quote=True)}">SciX / NASA ADS</a> · Checked <time datetime="{date}">{date}</time> · {len(papers)} papers</p>\n'
+    return (f'\n<p class="publication-updated">Source: <a href="{html.escape(SEARCH_URL, quote=True)}">SciX / NASA ADS</a> · Checked <time datetime="{date}">{date}</time> · {len(papers)} papers</p>\n'
             '<h3>First-author papers</h3>\n' +
             ('<ol class="publication-list">' + '\n'.join(render_entry(d) for d in first) + '</ol>' if first else '<p class="editorial-note">No first-author articles or preprints are currently indexed in this selection.</p>') +
-            '\n<h3>Co-authored papers</h3>\n<ol class="publication-list">' + '\n'.join(render_entry(d) for d in rest) + '</ol>\n'
-            '<p class="editorial-note">Citation counts are a dated SciX snapshot, not live counts. Catalogue records, observing proposals, theses, and conference abstracts are excluded. Preprints are labelled separately from journal articles.</p>\n')
+            '\n<h3>Co-authored papers</h3>\n<ol class="publication-list">' + '\n'.join(render_entry(d) for d in rest) + '</ol>\n')
 
 
 def fetch_records(token, opener=urlopen):
