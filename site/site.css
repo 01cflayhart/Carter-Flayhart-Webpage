@@ -19,15 +19,13 @@ a:hover { text-decoration-thickness: 2px; }
 .skip:focus { top: 12px; }
 .site-shell { width: min(1000px, calc(100% - 80px)); margin: 64px auto 20px; background: rgb(40 52 62 / .94); backdrop-filter: blur(18px) saturate(.7); box-shadow: 0 12px 70px #0004; border: 1px solid #81919a40; border-radius: 5px; }
 .profile-header { display: flex; align-items: center; gap: 34px; padding: 40px 48px 32px; background: var(--paper); border-radius: 5px 5px 0 0; }
-.portrait-placeholder { width: 142px; height: 158px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #35434c; border: 1px solid #657178; border-radius: 3px; color: #bec7c7; }
-.portrait-placeholder span { font: 2.7rem var(--serif); letter-spacing: .02em; }
-.portrait-placeholder small { font-size: .68rem; margin-top: 10px; }
+.portrait { width: 142px; height: 158px; flex-shrink: 0; object-fit: cover; object-position: center 25%; border: 1px solid #657178; border-radius: 3px; }
 h1 { margin: 0 0 3px; font: normal clamp(2rem, 4vw, 2.8rem)/1.2 var(--serif); letter-spacing: -.025em; }
 h1 a { color: var(--ink); text-decoration: none; }
 .profile-details { margin: 7px 0; color: var(--accent); font-size: .95rem; }
 .profile-intro { margin: 6px 0 9px; font-size: .9rem; color: var(--muted); max-width: 630px; }
 .profile-link { font-size: .82rem; }
-.section-nav { display: flex; flex-wrap: wrap; gap: 0 24px; padding: 0 48px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.section-nav { display: flex; flex-wrap: wrap; gap: 0 18px; padding: 0 48px; border-bottom: 1px solid var(--line); background: var(--paper); }
 .section-nav a { padding: 14px 0 12px; color: var(--muted); font-size: .82rem; white-space: nowrap; text-decoration: none; border-bottom: 3px solid transparent; }
 .section-nav a:hover { color: var(--accent); border-color: #84969f; }
 .section-nav a[aria-current] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
@@ -54,12 +52,27 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 .publication-list { list-style: none; padding: 0; margin: 14px 0 28px; }
 .publication { padding: 22px 0; border-bottom: 1px solid var(--line); }
 .publication:first-child { padding-top: 8px; }
-.publication h4 { margin: 0 0 8px; font: normal 1.15rem/1.5 var(--serif); }
+.publication h3 { margin: 0 0 8px; font: normal 1.15rem/1.5 var(--serif); }
 .publication-authors { font-size: .82rem; margin: 0 0 5px; }
 .publication-authors strong { font-weight: 600; }
 .publication-venue { font-size: .77rem; color: var(--muted); margin: 0 0 9px; }
 .publication-links { display: flex; flex-wrap: wrap; gap: 7px 20px; font-size: .77rem; }
 .citation-link { margin-left: auto; }
+.publication-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 24px 0 10px; }
+.publication-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.publication-filters button, select, input[type="search"] { font: inherit; font-size: .85rem; background: var(--paper); color: var(--ink); border: 1px solid #84969f; border-radius: 3px; padding: 8px 12px; }
+.publication-filters button { cursor: pointer; }
+.publication-filters button[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); }
+.publication-sort { font-size: .85rem; }
+.publication-status { font-size: .8rem; color: var(--muted); }
+.plain-list { padding-left: 20px; }
+.plain-list li { margin-bottom: 10px; }
+.talk-list { list-style: none; padding: 0; }
+.talk-list li { padding: 22px 0; border-bottom: 1px solid var(--line); }
+.talk-list h3 { margin: 6px 0 12px; }
+.talk-list time { font-size: .8rem; color: var(--muted); }
+.contact-list dt { margin-top: 22px; font-weight: 600; }
+.contact-list dd { margin: 4px 0 18px; overflow-wrap: anywhere; }
 .tour-entry { padding: 24px 0; border-top: 1px solid var(--line); }
 .tour-entry h3 { margin: 0 0 8px; font: 1.4rem var(--serif); }
 .tour-entry p { margin-bottom: 10px; }
@@ -72,9 +85,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 @media (max-width: 760px) {
   .site-shell { width: calc(100% - 28px); margin-top: 24px; }
   .profile-header { padding: 28px 24px 22px; gap: 20px; align-items: flex-start; }
-  .portrait-placeholder { width: 94px; height: 112px; }
-  .portrait-placeholder span { font-size: 2rem; }
-  .portrait-placeholder small { font-size: .58rem; }
+  .portrait { width: 94px; height: 112px; }
   h1 { font-size: 1.9rem; }
   .profile-details { font-size: .8rem; }
   .profile-intro { font-size: .82rem; }
@@ -87,8 +98,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 }
 @media (max-width: 400px) {
   .profile-header { gap: 15px; padding-inline: 20px; }
-  .portrait-placeholder { width: 76px; height: 96px; }
-  .portrait-placeholder small { font-size: .52rem; }
+  .portrait { width: 76px; height: 96px; }
   h1 { font-size: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }

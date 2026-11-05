@@ -1,5 +1,39 @@
 # Sources, schemas and provenance
 
+## Public site's current results and published ranking tables
+
+The archive described below is retained for historical research. Public power
+ratings use `tennis.current` and the CC BY 4.0 Valuebetennis feed configured in
+`current-source.json`, with independent ATP/WTA replays every six hours.
+
+`tennis.official` separately refreshes published singles-ranking snapshots daily:
+
+- ATP: https://www.espn.com/tennis/rankings. Parse the public page's embedded JSON
+  with a JSON decoder, never evaluate JavaScript. ESPN supplies 150 positions,
+  attributes the rankings to ATP, and supplies its own update date (initially
+  2026-10-29). That date is not assumed to be today's or ATP's latest edition.
+- WTA: https://api.wtatennis.com/tennis/players/ranked, the unauthenticated feed
+  used by https://www.wtatennis.com/rankings/singles. Use `metric=SINGLES`,
+  `type=rankSingles`, `sort=asc`, `pageSize=100`, and paginate `page` from zero
+  until a short page. Initial edition: 2026-11-02, 1,552 players.
+
+Store only ranking facts and provider profile links, with tour, edition, source,
+retrieval time, checksum, and refresh status. Require rank 1, minimum row counts,
+nonnegative integer points, ordered rankings, unique provider IDs, a consistent
+nonfuture edition, and complete pagination. A failed tour keeps its last valid
+edition independently; failures and stale editions remain visible in the UI.
+
+Direct ATP access was retested in ordinary Chromium on 5 November 2026 and returned
+Cloudflare HTTP 403, “Sorry, you have been blocked.” No challenge, proxy, or access
+control bypass is used. ESPN is an independent source, explicitly labelled.
+
+Published rankings are **not** provisional in-tournament live projections and
+are not fed into the historical opponent categories. IDs are namespaced
+`espn:ATP:…` / `wta:WTA:…`; no name-only joins to `valuebetennis:…` histories.
+The website's “Published singles rankings” table is searchable and tour-isolated.
+These provider datasets carry their own terms; the Valuebetennis CC BY license
+must not be applied to them. Do not copy headshots or claim exhaustive live scores.
+
 ## Current source
 
 Jeff Sackmann / Tennis Abstract, via Aneeshers' archival mirror, pinned to

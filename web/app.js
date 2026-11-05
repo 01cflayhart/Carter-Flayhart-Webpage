@@ -81,6 +81,7 @@ function updateFreshness() {
   const quarantined = meta.audit.quarantined_official_rankings?.length || 0;
   $("#freshness").textContent = `${meta.historical ? "Historical archive, not a live feed." : 'Separate '+state.tour+' rankings. Open feed checked through '+fmtDate(meta.as_of)+'.'} Latest accepted result: ${fmtDate(meta.latest_result||meta.as_of)}${meta.staleness_days > 0 ? ` (${meta.staleness_days} days before today)` : ''}. Coverage is not certified exhaustive; missing or incomplete scores are excluded.${quarantined ? ` ${quarantined} ambiguous official ranking entries quarantined.`:''}${failed ? ' Last update failed; showing the last good publication.':''}`;
   $("#build-info").textContent = `Model ${meta.model_version}`;
+  document.dispatchEvent(new CustomEvent('court:meta', {detail: {tour: state.tour}}));
 }
 function profileParams(extra={}) {return params({...extra, offset:resultOffset, limit:10, significant:resultMode});}
 async function openPlayer(id, first=true) {
@@ -206,6 +207,7 @@ let tourSequence=0;
 async function selectTour(tour){
   const sequence=++tourSequence;
   state.tour=tour;state.offset=0;state.q='';$('#search').value='';meta=undefined;
+  document.dispatchEvent(new CustomEvent('court:tour', {detail: {tour}}));
   listController?.abort();profileSequence++;resultSequence++;$('#player-dialog').close();
   $('#table-body').innerHTML='<tr><td>Loading '+tour+' rankings…</td></tr>';
   $$('[data-tour]').forEach(b=>{b.classList.toggle('active',b.dataset.tour===tour);b.setAttribute('aria-pressed',String(b.dataset.tour===tour));});

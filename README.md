@@ -1,7 +1,7 @@
 # Carter Flayhart — personal website & Court Current
 
 Academic personal website with About Me, Research, Publications, Talks & Conferences,
-Sports Analysis, and Hobbies, plus **completely separate ATP and
+Sports Analysis, Hobbies, CV, and Contact, plus **completely separate ATP and
 WTA singles power rankings**, designed for free GitHub Pages hosting.
 
 - Repository: https://github.com/01cflayhart/Carter-Flayhart-Webpage
@@ -61,6 +61,14 @@ available; official-rank comparisons are disabled rather than filled with today'
 or June's ranks. ATP's official page is a reference, not a licensed public feed:
 its terms restrict republication and systematic collection without permission.
 
+The dashboards now also show an independent, searchable published-ranking table:
+ATP via ESPN (top 150 supplied), and WTA's public rankings feed (1,552 players in
+the initial 2 November edition). `python3 -m tennis.official` validates and records
+source dates, checksums and retrieval times. These source identities are **not**
+joined to match histories by name. Today’s ranks do not rewrite historical records.
+`website-data.yml` checks rankings and synchronizes the public Overleaf CV PDF
+daily at 08:43 UTC; result-based ratings continue to rebuild every six hours.
+
 On the new source's covered sample, basic Elo currently slightly outperforms this
 form model. Both results are shown. The model remains provisional; no independent
 final holdout or comprehensive live coverage is claimed.
@@ -90,7 +98,9 @@ Browser tests require current snapshots (`tennis.current`) and exported assets
 | `current-source.json` | Open feed attribution and temporal scope |
 | `.github/workflows/pages.yml` | Scheduled testing, data refresh and deployment |
 | `docs/PUBLIC_SITE.md` | Hosting, domain, data license and official-rank dependencies |
-| `docs/PERSONAL_SITE.md` | Personal page content, portrait placeholder, and COSMOS-Web image attribution |
+| `docs/PERSONAL_SITE.md` | Verified CV/profile content, CV PDF synchronization, publication filters, and image attribution |
+| `tennis/official.py` | Independent, dated ATP/ESPN and official WTA ranking snapshots |
+| `scripts/refresh-cv.cjs` | Read-only Overleaf PDF synchronization |
 | `publications/update.py` | Supported SciX API refresh, papers-only filtering, deduplication, and publication ordering |
 
 The original June ATP archive tooling remains available separately for reproducible

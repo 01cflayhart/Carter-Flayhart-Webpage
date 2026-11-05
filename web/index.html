@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#153f35">
   <title>Court Current — Tennis power rankings</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
-  <script src="./runtime.js" defer></script><script src="./static-api.js" defer></script><script src="./app.js" defer></script>
+  <script src="./runtime.js" defer></script><script src="./static-api.js" defer></script><script src="./app.js" defer></script><script src="./official.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#rankings">Skip to rankings</a>
@@ -23,6 +23,14 @@
     <p class="table-note" id="comparison-note">* Historical categories use event-start approximations. Similar = ±25; better/worse exclude that band. Click a player for the full story.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-label="Sortable player rankings"><table id="ranking-table"><thead id="table-head"></thead><tbody id="table-body"><tr><td>Loading rankings…</td></tr></tbody></table></div>
     <div class="pagination"><span id="result-count" aria-live="polite">Loading…</span><div><button id="previous" disabled>← Previous</button><button id="next" disabled>Next →</button></div></div>
+  </section>
+  <section id="published-rankings" aria-labelledby="published-title">
+    <div class="section-heading"><div><span class="eyebrow">PUBLISHED SINGLES RANKINGS</span><h2 id="published-title">The points-based standings.</h2></div></div>
+    <p id="published-source" class="table-note" role="status">Loading the dated ranking edition…</p>
+    <p class="table-note">Checked daily. Editions are usually weekly—not point-by-point live projections. These published rankings are separate from the power model; today’s ranks are never substituted into historical match records.</p>
+    <label class="search"><input type="search" id="published-search" aria-label="Search published rankings" placeholder="Find a player or country…"></label>
+    <div class="table-scroll published-scroll" tabindex="0" role="region" aria-label="Published singles ranking table"><table><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Country</th><th scope="col">Points</th></tr></thead><tbody id="published-body"><tr><td colspan="4">Loading…</td></tr></tbody></table></div>
+    <div class="pagination"><span id="published-count" aria-live="polite"></span><button type="button" id="published-more" hidden>Show more rankings</button></div>
   </section>
   <section class="bottom-note"><span class="eyebrow">A LITTLE CONTEXT</span><p>Rankings tell you what happened.<br><em>Power ratings ask what it means.</em></p><div>Opponent-adjusted. Recency-weighted. Surface-aware.<br>Transparent about what the data can—and can't—tell us.</div></section>
 </main>

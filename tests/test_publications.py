@@ -62,7 +62,13 @@ class PublicationsTests(unittest.TestCase):
         self.assertNotIn('Articles and preprints, with each paper listed once.', result)
         self.assertNotIn('Citation counts are a dated SciX snapshot', result)
         self.assertIn('SciX / NASA ADS', result)
-        self.assertIn('Co-authored papers', result)
+        self.assertNotIn('<h3>Co-authored papers', result)
+        self.assertNotIn('<h3>First-author papers', result)
+        self.assertIn('data-publication-filter="first"', result)
+        self.assertIn('data-publication-filter="refereed"', result)
+        self.assertIn('data-publication-filter="non-refereed"', result)
+        self.assertEqual(result.count('class="publication-list"'), 1)
+        self.assertIn('data-refereed="true"', result)
 
     def test_pagination_and_api_auth(self):
         requests = []

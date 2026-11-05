@@ -8,6 +8,40 @@ if (profile) new ResizeObserver(() => {
 const sections = [...document.querySelectorAll('.content-section[id]')];
 const links = [...document.querySelectorAll('.section-nav a[href^="#"]')];
 
+const publicationList = document.querySelector('.publication-list');
+if (publicationList) {
+  const papers = [...publicationList.querySelectorAll('.publication')];
+  const buttons = [...document.querySelectorAll('[data-publication-filter]')];
+  const sort = document.querySelector('#publication-sort');
+  const status = document.querySelector('.publication-status');
+  let filter = 'all';
+  function updatePublications() {
+    papers.sort((a, b) => {
+      const date = b.dataset.date.localeCompare(a.dataset.date);
+      if (sort.value === 'newest') return date || a.dataset.bibcode.localeCompare(b.dataset.bibcode);
+      if (sort.value === 'oldest') return -date || a.dataset.bibcode.localeCompare(b.dataset.bibcode);
+      if (sort.value === 'title') return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
+      return Number(b.dataset.citations) - Number(a.dataset.citations) || date || a.dataset.bibcode.localeCompare(b.dataset.bibcode);
+    });
+    let count = 0;
+    for (const paper of papers) {
+      paper.hidden = !(filter === 'all' || (filter === 'first' && paper.dataset.firstAuthor === 'true') || (filter === 'refereed' && paper.dataset.refereed === 'true') || (filter === 'non-refereed' && paper.dataset.refereed === 'false'));
+      if (!paper.hidden) count++;
+      publicationList.append(paper);
+    }
+    for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.publicationFilter === filter));
+    status.textContent = count ? `${count} ${count === 1 ? 'paper' : 'papers'}` : 'No papers in this selection yet.';
+  }
+  document.querySelector('.publication-controls').hidden = false;
+  status.hidden = false;
+  for (const button of buttons) button.addEventListener('click', () => { filter = button.dataset.publicationFilter; updatePublications(); });
+  sort.addEventListener('change', updatePublications);
+  updatePublications();
+}
+
+const talkList = document.querySelector('.talk-list');
+if (talkList) [...talkList.children].sort((a, b) => b.dataset.date.localeCompare(a.dataset.date)).forEach(talk => talkList.append(talk));
+
 function showSection(focus = false) {
   const selected = sections.find(section => '#' + section.id === location.hash) || sections[0];
   for (const section of sections) section.hidden = section !== selected;

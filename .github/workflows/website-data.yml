@@ -1,0 +1,47 @@
+name: Refresh CV and published tennis rankings
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '43 8 * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: website-data-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Read the live Overleaf CV and preserve the last PDF on failure
+        id: cv
+        continue-on-error: true
+        run: node scripts/refresh-cv.cjs
+      - name: Refresh dated ATP and WTA ranking editions independently
+        run: python -m tennis.official
+      - name: Commit public snapshots and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add site/assets/carter-flayhart-cv.pdf site/sports/tennis/official-rankings.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Refresh CV and published tennis rankings'
+            git push
+            gh workflow run pages.yml --ref main
+          fi
+      - name: Report CV refresh failure
+        if: steps.cv.outcome == 'failure'
+        run: echo '::warning::The CV could not be refreshed; the last valid PDF remains published.'

@@ -115,8 +115,10 @@ def render_entry(doc):
     if doc['doctype'] == 'eprint':
         venue = 'arXiv preprint · not peer reviewed'
     count = doc['citation_count']
-    return (f'<li class="publication" data-bibcode="{html.escape(doc["bibcode"], quote=True)}" data-citations="{count}">'
-            f'<h4>{esc(doc["title"][0])}</h4><p class="publication-authors">{author_html}</p>'
+    first = str(doc['first_author']).lower()
+    refereed = str('REFEREED' in doc.get('property', [])).lower()
+    return (f'<li class="publication" data-bibcode="{html.escape(doc["bibcode"], quote=True)}" data-citations="{count}" data-first-author="{first}" data-refereed="{refereed}" data-date="{esc(doc.get("pubdate", ""))}">'
+            f'<h3>{esc(doc["title"][0])}</h3><p class="publication-authors">{author_html}</p>'
             f'<p class="publication-venue">{esc(venue)} · {esc(date)}</p>'
             f'<div class="publication-links">{" ".join(links)}'
             f'<a class="citation-link" href="https://scixplorer.org/abs/{bibcode}/citations">{count} {"citation" if count == 1 else "citations"}</a></div></li>')
@@ -124,13 +126,16 @@ def render_entry(doc):
 
 def render(snapshot):
     papers = select_papers(snapshot['records'])
-    first = [d for d in papers if d['first_author']]
-    rest = [d for d in papers if not d['first_author']]
     date = snapshot['checked_at'][:10]
     return (f'\n<p class="publication-updated">Source: <a href="{html.escape(SEARCH_URL, quote=True)}">SciX / NASA ADS</a> · Checked <time datetime="{date}">{date}</time> · {len(papers)} papers</p>\n'
-            '<h3>First-author papers</h3>\n' +
-            ('<ol class="publication-list">' + '\n'.join(render_entry(d) for d in first) + '</ol>' if first else '<p class="editorial-note">No first-author articles or preprints are currently indexed in this selection.</p>') +
-            '\n<h3>Co-authored papers</h3>\n<ol class="publication-list">' + '\n'.join(render_entry(d) for d in rest) + '</ol>\n')
+            '<div class="publication-controls" hidden><div class="publication-filters" role="group" aria-label="Filter publications">'
+            '<button type="button" data-publication-filter="all" aria-pressed="true">All papers</button>'
+            '<button type="button" data-publication-filter="first" aria-pressed="false">First author</button>'
+            '<button type="button" data-publication-filter="refereed" aria-pressed="false">Refereed</button>'
+            '<button type="button" data-publication-filter="non-refereed" aria-pressed="false">Non-refereed</button></div>'
+            '<label class="publication-sort">Sort by <select id="publication-sort"><option value="citations">Citations</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Title</option></select></label></div>\n'
+            '<p class="publication-status" role="status" hidden></p>\n'
+            '<ol class="publication-list">' + '\n'.join(render_entry(d) for d in papers) + '</ol>\n')
 
 
 def fetch_records(token, opener=urlopen):

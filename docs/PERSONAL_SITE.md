@@ -9,11 +9,25 @@ The profile and content use a muted slate palette with a lightly translucent,
 blurred content layer over the COSMOS-Web background, rather than a bright paper
 panel. Text, links, and focus indicators retain accessible contrast.
 
-## Content awaiting Carter
+## Profile, CV, and contact
 
-- Portrait (replace the labelled initials placeholder in both profile headers).
-- Fuller bio and preferred contact links.
-- Research summaries, talks/posters/conferences, and other hobbies.
+The portrait is Carter's supplied photo, extracted from the publicly shared Google
+Doc on 5 November 2026 and resized as `site/assets/carter-flayhart.jpg`. It appears
+in both profile headers. Bio, education, research, awards, and the four presentation
+summaries were checked against Carter's three-page Overleaf CV (updated 5 November
+2026). Talks retain month precision and are newest-first in HTML and JavaScript.
+User-supplied hobbies and emails appear in Hobbies and Contact; no phone number
+was copied into the contact page.
+
+CV follows Hobbies in navigation, then Contact. CV opens
+`site/assets/carter-flayhart-cv.pdf` in a new tab. `scripts/refresh-cv.cjs` reads
+the public Overleaf viewer in an ordinary browser, retrieves the compiled PDF,
+validates completeness, and replaces it atomically. The **Refresh CV and published
+tennis rankings** workflow (`website-data.yml`) checks daily at **08:43 UTC** and
+can be run manually. This is a synchronized PDF, not a compile-on-every-click
+service: changes appear after a successful sync and deployment. The live Overleaf
+document is also linked from About Me. If access or compilation fails, the last
+valid PDF remains available. No cookies or temporary compilation URLs are published.
 
 The profile's academic title, institution, and research description use Carter's
 provided wording. No email address, publication, or talk was inferred.
@@ -36,8 +50,10 @@ document types, titles, journal information, identifiers, and dates.
 - Deduplicate connected DOI, arXiv, bibcode, or normalized-title/first-author aliases.
   Prefer the journal record over its preprint and never sum citation counts from
   duplicate records (use the maximum recorded count).
-- Carter's first-author papers appear first, newest first. Remaining papers are
-  sorted by descending citation count, breaking ties by date and bibcode.
+- One paper list, with All papers / First author / Refereed / Non-refereed buttons.
+  Refereed status uses SciX's `REFEREED` property, not the mere existence of a DOI.
+  Client-side sorting offers citations (default), newest, oldest, and title.
+  The non-JavaScript fallback keeps first-author-first and citation ordering.
 - Label preprints as not peer reviewed and show the source check date.
 - Failed requests or invalid/empty results leave the existing snapshot unchanged.
 

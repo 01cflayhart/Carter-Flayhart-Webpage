@@ -152,8 +152,13 @@ def handler_for(app):
 
         def do_GET(self):
             parsed = urlsplit(self.path)
+            if parsed.path == '/official-rankings.json':
+                try:
+                    return self.json_response(read_json(app.root / 'site/sports/tennis/official-rankings.json'))
+                except (OSError, ValueError):
+                    return self.json_response({'error': 'Published rankings unavailable'}, 503)
             if not parsed.path.startswith("/api/"):
-                if parsed.path not in ("/", "/index.html", "/style.css", "/app.js", "/favicon.svg", "/runtime.js", "/static-api.js"):
+                if parsed.path not in ("/", "/index.html", "/style.css", "/app.js", "/favicon.svg", "/runtime.js", "/static-api.js", "/official.js"):
                     self.send_error(404)
                     return
                 return super().do_GET()
