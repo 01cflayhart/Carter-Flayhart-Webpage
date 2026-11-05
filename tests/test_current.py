@@ -42,6 +42,21 @@ class CurrentSourceTests(unittest.TestCase):
         self.assertTrue(adapt([row(categorie='Grand Chelem',score='6-4 6-3 6-1')],'ATP',date(2026,11,4))[0])
         self.assertTrue(adapt([row(genre='wta',categorie='Grand Chelem')],'WTA',date(2026,11,4))[0])
 
+    def test_qualifying_rounds_do_not_masquerade_as_tour_main_draws(self):
+        for round_code in ('0','1','2','3'):
+            adapted,_=adapt([row(tour=round_code,categorie='Grand Chelem')],'ATP',date(2026,11,4))
+            match=normalize(adapted)[0][0]
+            self.assertEqual(match['tier'],'Qualifying');self.assertTrue(match['qualifying'])
+        adapted,_=adapt([row(tour='4')],'ATP',date(2026,11,4))
+        self.assertEqual(normalize(adapted)[0][0]['tier'],'Tour')
+
+    def test_surface_setting_is_preserved_and_carpet_omitted(self):
+        for label,expected in [('dur','Outdoor hard'),('dur intérieur','Indoor hard')]:
+            adapted,_=adapt([row(surface=label)],'ATP',date(2026,11,4))
+            self.assertEqual(normalize(adapted)[0][0]['surface'],expected)
+        adapted,audit=adapt([row(surface='moquette intérieur')],'ATP',date(2026,11,4))
+        self.assertFalse(adapted);self.assertEqual(audit['carpet_excluded'],1)
+
     def test_future_results_are_not_used(self):
         self.assertFalse(adapt([row(date='2026-11-05 12:00:00')],'ATP',date(2026,11,4))[0])
 

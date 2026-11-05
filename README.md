@@ -7,7 +7,9 @@ WTA singles power rankings**, designed for free GitHub Pages hosting.
 - Repository: https://github.com/01cflayhart/Carter-Flayhart-Webpage
 - Pages: https://01cflayhart.github.io/Carter-Flayhart-Webpage/
 - Tennis: https://01cflayhart.github.io/Carter-Flayhart-Webpage/sports/tennis/
-- Requested custom domain: **CarterFlayhart.com**, pending user registration/DNS.
+- Requested free address: **https://CarterFlayhart.github.io/**. Requires a GitHub
+  account/organization named `CarterFlayhart`; current hosting remains unchanged
+  until its creation. No account rename or ownership transfer is performed.
 
 ## Build and publish
 
@@ -49,23 +51,30 @@ Current open source: **Valuebetennis**, [CSV documentation](https://www.valuebet
 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution required.
 No bookmaker odds enter the model. The site is not betting advice.
 
-The November 4, 2026 import checks results through that date. Latest accepted ATP
-result: November 4; WTA: November 3. There are 3,142 ATP and 2,551 WTA players with
-15,620 / 11,268 covered trailing-year matches respectively. These counts describe
+The November 5, 2026 replay has latest accepted ATP results on November 4, WTA on
+November 3. After carpet exclusions there are 3,122 ATP and 2,534 WTA players with
+15,636 / 11,101 covered trailing-year matches respectively. These counts describe
 accepted coverage, **not full professional-tour coverage**. Large numbers of missing
 and incomplete scores are excluded and disclosed in the ledger.
 
 The CSV has no official ranks/points, country/age metadata, verified injuries or
 licensed photos. Missing fields stay unknown. Historical power comparisons are
-available; official-rank comparisons are disabled rather than filled with today's
+available; historical official-rank comparisons are disabled rather than filled with today's
 or June's ranks. ATP's official page is a reference, not a licensed public feed:
 its terms restrict republication and systematic collection without permission.
 
-The dashboards now also show an independent, searchable published-ranking table:
-ATP via ESPN (top 150 supplied), and WTA's public rankings feed (1,552 players in
-the initial 2 November edition). `python3 -m tennis.official` validates and records
-source dates, checksums and retrieval times. These source identities are **not**
-joined to match histories by name. Today’s ranks do not rewrite historical records.
+The dashboards use **TennisONE** for both published singles-ranking tables and an
+identity-verified current-rank prior in the power scores. The first 1,000 positions
+are fetched (ties included). No edition date is supplied: dates mean **observed**.
+Cross-links require independent profile birth-date or country/tour checks, not
+name-only matching. The prior blends 35% toward a bounded rank seed, capped at
+±200 points; raw ranking points are displayed, not added as Elo points. Today's
+ranks do not rewrite historical opponent categories or backtest predictions.
+
+Tour main draws have 100% rating weight, qualifying 40%, Challengers 30%, ITF 8%,
+and team events 50%; Challenger/ITF qualifying receive half their tier weight.
+Both anchor and form are weighted. Indoor and outdoor hard have separate evidence;
+carpet is excluded completely. See [methodology](docs/METHODOLOGY.md) for limits.
 `website-data.yml` checks rankings and synchronizes the public Overleaf CV PDF
 daily at 08:43 UTC; result-based ratings continue to rebuild every six hours.
 

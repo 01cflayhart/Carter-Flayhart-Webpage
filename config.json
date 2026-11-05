@@ -15,6 +15,6 @@
     "url": "https://github.com/Aneeshers/tennis-sackmann-archive",
     "live": false
   },
-  "rating": {"baseline": 1250, "half_life_days": 120, "k": 40, "anchor_k": 24, "form_weight": 0.35, "surface_blend_matches": 12, "similar_band": 25, "extra_impact": false, "include_team": true, "retirement_weight": 0.5},
+  "rating": {"baseline": 1250, "half_life_days": 120, "k": 40, "anchor_k": 24, "form_weight": 0.35, "surface_blend_matches": 12, "similar_band": 25, "extra_impact": false, "include_team": true, "retirement_weight": 0.5, "tier_weights": {"Tour": 1.0, "Qualifying": 0.4, "Challenger": 0.3, "ITF": 0.08, "Team": 0.5, "Unknown": 0.0}, "qualifying_multiplier": 0.5, "official_prior_weight": 0.35},
   "tour": "ATP"
 }

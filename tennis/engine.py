@@ -5,8 +5,8 @@ from datetime import date, timedelta
 from itertools import groupby
 import math
 
-VERSION = "0.2.0-provisional"
-SURFACES = ("Hard", "Clay", "Grass", "Carpet")
+VERSION = "0.3.0-provisional"
+SURFACES = ("Outdoor hard", "Indoor hard", "Clay", "Grass")
 
 
 def shift_months(day, months):
@@ -56,14 +56,14 @@ def significant(own, opponent, won, band=25):
 
 def tier(row):
     level = row.get("tourney_level", "")
-    if row.get("round", "").startswith("Q") and row.get("round") != "QF":
-        return "Qualifying"
     if level == "C":
         return "Challenger"
     if level in ("S", "D") or row.get("tourney_name", "").startswith("Davis Cup"):
         return "Team"
     if level in ("15", "25", "35", "50", "75", "100") or row.get("family") == "ITF":
         return "ITF"
+    if row.get("round", "").startswith("Q") and row.get("round") != "QF":
+        return "Qualifying"
     if level in ("G", "M", "A", "F", "250", "500", "1000"):
         return "Tour"
     return "Unknown"
@@ -79,6 +79,9 @@ def normalize(rows):
             if not event or not w or not l or w == l or not row.get("winner_name") or not row.get("loser_name"):
                 raise ValueError("Invalid identity")
             score = row.get("score", "").strip()
+            if row.get('surface') == 'Carpet':
+                audit['carpet_excluded'] += 1
+                continue
             if row.get("tourney_level") == "E":
                 audit["exhibitions"] += 1
                 continue
@@ -93,8 +96,13 @@ def normalize(rows):
                 audit["duplicates"] += 1
                 continue
             seen[key] = signature
+            surface = row.get('surface')
+            if surface == 'Hard':
+                setting = str(row.get('indoor', '')).lower()
+                surface = 'Indoor hard' if setting in ('true','1') else 'Outdoor hard' if setting in ('false','0') else 'Unknown'
             match = dict(row, day=day, w=w, l=l, event=event, tier=tier(row),
-                         surface=row.get("surface") if row.get("surface") in SURFACES else "Unknown",
+                         qualifying=row.get('round', '').startswith('Q') and row.get('round') != 'QF',
+                         surface=surface if surface in SURFACES else "Unknown",
                          retired="RET" in score.upper(), precision="match date" if row.get("match_date") else "event start",
                          identity="|".join(key))
             matches.append(match)
@@ -216,7 +224,10 @@ def replay(matches, config, as_of, collect=True):
                                 "retired": m["retired"], "precision": m["precision"]})
             basic_delta[w] += 32 * (1 - pb)
             basic_delta[l] -= 32 * (1 - pb)
-            weight = rc["retirement_weight"] if m["retired"] else 1
+            event_weight = rc.get('tier_weights', {}).get(m['tier'], 1)
+            if m.get('qualifying') and m['tier'] != 'Qualifying':
+                event_weight *= rc.get('qualifying_multiplier', .5)
+            weight = event_weight * (rc["retirement_weight"] if m["retired"] else 1)
             for pid, opp, won, prob, surfprob, ap, asp, side, other in (
                 (w, l, True, p, ps, anchor_p, anchor_ps, "winner", "loser"), (l, w, False, 1 - p, 1 - ps, 1-anchor_p, 1-anchor_ps, "loser", "winner"),
             ):
@@ -232,7 +243,7 @@ def replay(matches, config, as_of, collect=True):
                 if collect:
                     history[pid].append({"date": day.isoformat(), "event": m.get("tourney_name", ""), "tier": m["tier"], "round": m.get("round", ""),
                         "surface": s, "opponent": bio[opp]["name"], "opponent_id": opp, "won": won, "score": m.get("score", ""),
-                        "retired": m["retired"], "delta": round(anchor_delta + rc.get("form_weight", .35) * delta, 3), "expected": round(prob, 5), "precision": m["precision"],
+                         "retired": m["retired"], "event_weight": event_weight, "qualifying": m.get('qualifying', False), "delta": round(anchor_delta + rc.get("form_weight", .35) * delta, 3), "expected": round(prob, 5), "precision": m["precision"],
                         "own_atp": integer(m.get(side + "_rank")), "opp_atp": integer(m.get(other + "_rank")),
                         "own_power": pre.get(pid), "opp_power": pre.get(opp)})
         for pid, s, delta, sd, ad, asd in pending:
@@ -258,13 +269,21 @@ def replay(matches, config, as_of, collect=True):
     return states, bio, history, snapshots, predictions, prior_ranks
 
 
-def build(matches, rankings, config, as_of, health=None, photos=None):
+def build(matches, rankings, config, as_of, health=None, photos=None, current_rankings=None):
     states, bio, history, snapshots, predictions, previous = replay(matches, config, as_of)
     rc = config["rating"]
     start, recent = shift_months(as_of, -12), shift_months(as_of, -3)
     eligible = [pid for pid, st in states.items() if st.total]
-    ordered = sorted(eligible, key=lambda p: (-states[p].score(config=rc), p))
-    surface_ranks = {s: {pid: i + 1 for i, pid in enumerate(sorted(eligible, key=lambda p: (-states[p].score(s, rc), p)))} for s in SURFACES}
+    # A current, identity-verified observation is a publication-time prior only.
+    # It NEVER enters historical replay, opponent categories, or backtest inputs.
+    current = {pid: r for pid,r in (current_rankings or {}).items()
+               if r.get('observed_at') and 0 <= (as_of-parse_date(r['observed_at'][:10])).days <= 14 and integer(r.get('rank'))}
+    weight = rc.get('official_prior_weight', .35)
+    adjustments = {pid: max(-200, min(200, weight * (seed(current[pid]['rank'], rc['baseline']) - states[pid].strength())))
+                   for pid in eligible if pid in current}
+    score_on = lambda pid,s='Overall': states[pid].score(s, rc) + adjustments.get(pid,0)
+    ordered = sorted(eligible, key=lambda p: (-score_on(p), p))
+    surface_ranks = {s: {pid: i + 1 for i, pid in enumerate(sorted(eligible, key=lambda p: (-score_on(p,s), p)))} for s in SURFACES}
     rank_day = max((d for d in rankings if d <= as_of), default=None)
     edition = rankings.get(rank_day, {})
     players = []
@@ -297,14 +316,17 @@ def build(matches, rankings, config, as_of, health=None, photos=None):
         photo = (photos or {}).get(pid)
         if photo and not (str(photo.get("url", "")).startswith("https://") and str(photo.get("license_url", "")).startswith("https://") and photo.get("credit")):
             raise ValueError(f"Photo needs HTTPS URL, credit and license for {pid}")
-        official = edition.get(pid, {})
-        strength = st.strength()
-        score = st.score(config=rc)
+        official = current.get(pid) or edition.get(pid, {})
+        adjustment = adjustments.get(pid, 0)
+        strength = st.strength() + adjustment
+        score = score_on(pid)
         players.append(dict(person, rank=i + 1, rating=round(score, 2), strength=round(strength, 2),
             availability_adjustment=round(score - strength, 2), age=round(age, 1) if age is not None else None,
-            atp_rank=official.get("rank"), atp_points=official.get("points"), atp_date=rank_day.isoformat() if official else None,
-            movement=previous[pid] - (i + 1) if pid in previous else None,
-            surfaces={s: {"rank": surface_ranks[s][pid], "rating": round(st.score(s, rc), 2), "matches": st.counts[s], "provisional": st.counts[s] < 12} for s in SURFACES},
+            result_strength=round(st.strength(),2), official_adjustment=round(adjustment,2),
+            atp_rank=official.get("rank"), atp_points=official.get("points"), atp_date=rank_day.isoformat() if rank_day and pid not in current and official else None,
+            official_observed_at=official.get('observed_at'), official_source=official.get('source_url'), official_identity=official.get('id'),
+            movement=previous[pid] - (i + 1) if pid in previous and not current else None,
+            surfaces={s: {"rank": surface_ranks[s][pid], "rating": round(score_on(pid,s), 2), "matches": st.counts[s], "provisional": st.counts[s] < 12} for s in SURFACES},
             stats=stats, history=records, last_played=st.last.isoformat(), inactive_days=inactive, flags=flags, health=status, photo=photo,
             matches=st.total, tiers=sorted({r["tier"] for r in records}), confidence="Established" if st.total >= 30 else "Developing" if st.total >= 15 else "Provisional"))
     return {"players": players, "as_of": as_of.isoformat(), "window_start_exclusive": start.isoformat(), "recent_start_exclusive": recent.isoformat(),

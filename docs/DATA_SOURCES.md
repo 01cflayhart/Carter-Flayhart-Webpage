@@ -8,28 +8,35 @@ ratings use `tennis.current` and the CC BY 4.0 Valuebetennis feed configured in
 
 `tennis.official` separately refreshes published singles-ranking snapshots daily:
 
-- ATP: https://www.espn.com/tennis/rankings. Parse the public page's embedded JSON
-  with a JSON decoder, never evaluate JavaScript. ESPN supplies 150 positions,
-  attributes the rankings to ATP, and supplies its own update date (initially
-  2026-10-29). That date is not assumed to be today's or ATP's latest edition.
-- WTA: https://api.wtatennis.com/tennis/players/ranked, the unauthenticated feed
-  used by https://www.wtatennis.com/rankings/singles. Use `metric=SINGLES`,
-  `type=rankSingles`, `sort=asc`, `pageSize=100`, and paginate `page` from zero
-  until a short page. Initial edition: 2026-11-02, 1,552 players.
+- ATP and WTA: https://tennis.one/ranking, using the same unauthenticated public
+  `https://bleachr-web-api-prod.herokuapp.com/api/players/rankings` feed as the
+  web page. Parameters: `gender=male|female`, `sort=singles_rank=ASC`,
+  `currentPage=1…`, `take=100`. No login or session token is required.
+- Retrieve the first 1,000 positions (including tied positions), not thousands
+  of unranked profiles. Initial import: 1,062 ATP and 1,104 WTA players. Validate
+  every page, gender, unique IDs, ordered positive ranks and nonnegative points.
+- TennisONE supplies **no edition date**. Store `edition: null`, retain retrieval
+  and observation timestamps, and label them honestly. Some lower-profile points
+  conflict with rank order, and one female profile has an erroneous ATP label;
+  these source inconsistencies are disclosed, not silently repaired. Tour identity
+  comes from the requested singles list plus explicit gender, never that free-text
+  profile label alone.
 
 Store only ranking facts and provider profile links, with tour, edition, source,
-retrieval time, checksum, and refresh status. Require rank 1, minimum row counts,
-nonnegative integer points, ordered rankings, unique provider IDs, a consistent
-nonfuture edition, and complete pagination. A failed tour keeps its last valid
-edition independently; failures and stale editions remain visible in the UI.
+retrieval time, checksum, and refresh status. Birth date/gender are retained only
+as identity-validation facts, not copied headshots or biographies. A failed tour
+keeps its last valid snapshot independently; failures/staleness remain visible.
 
 Direct ATP access was retested in ordinary Chromium on 5 November 2026 and returned
 Cloudflare HTTP 403, “Sorry, you have been blocked.” No challenge, proxy, or access
-control bypass is used. ESPN is an independent source, explicitly labelled.
+control bypass is used. ESPN was the previous ATP fallback; it is no longer the
+scheduled source. The older adapter functions remain for replaying archived tests.
 
 Published rankings are **not** provisional in-tournament live projections and
 are not fed into the historical opponent categories. IDs are namespaced
-`espn:ATP:…` / `wta:WTA:…`; no name-only joins to `valuebetennis:…` histories.
+`tennisone:ATP:…` / `tennisone:WTA:…`. Independent public profile metadata is
+required to cross-link `valuebetennis:…` IDs (see METHODOLOGY.md). The public
+player-history endpoint returned 401 and is not used. No authentication bypass.
 The website's “Published singles rankings” table is searchable and tour-isolated.
 These provider datasets carry their own terms; the Valuebetennis CC BY license
 must not be applied to them. Do not copy headshots or claim exhaustive live scores.

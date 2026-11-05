@@ -1,4 +1,4 @@
-# Rating methodology — provisional v0.2
+# Rating methodology — provisional v0.3
 
 ## Strength, form, availability, rank
 
@@ -39,14 +39,68 @@ to avoid double-counting surprises without validation. When enabled it uses 1.15
 for 35–65% contests, 1.25 for surprising outcomes, and 0.75 for routine outcomes.
 Official-rank reporting bands are not substituted for modeled opponent strength.
 
+## Competition-level weighting
+
+Both the persistent anchor and rolling form updates multiply their Elo residuals
+by competition weight: tour main draw **1.00**, tour qualifying **0.40**,
+Challenger **0.30**, ITF **0.08**, team **0.50**, unknown **0.00**. Challenger and
+ITF qualifying multiply their own tier by 0.50 (0.15 / 0.04). Retirement weight
+then multiplies this again. Counting many low-level wins is not equivalent to
+winning the same number of tour matches. Raw W–L counts remain unweighted.
+
+Valuebetennis source rounds 0–3 are qualifying, not tour main draws. The public
+match pages were checked for codes 1 (Qualif. 1), 3 (Qualifications), and 4
+(first main-draw round). ATP Slam qualifying requires two won sets, main draws
+three. Competition weight is configurable and provisional, not tuned to put any
+particular player on top or claimed to be a calibrated optimum.
+
+## Identity-verified current-ranking prior
+
+The public TennisONE ranking feed supplies current singles ranks and points.
+Name matching **only proposes** a candidate. `scripts/refresh-tennis-identities.cjs`
+reads the corresponding public Valuebetennis profile in ordinary Chromium and
+requires exact normalized full name, tour/gender and matching birth date; if
+either birth date is absent, matching country and tour/gender are required.
+Conflicting or ambiguous identities remain unknown. Proofs retain profile URL,
+content checksum, method and timestamp in `site/sports/tennis/identities.json`.
+Documented aliases in `tennis/identity-aliases.json` require both matching birth
+date and country, plus the public citation connecting the names. The initial
+Cori/Coco Gauff alias is independently corroborated, never fuzzy surname matching.
+New verification works through the first 1,000 positions per tour in rank order,
+at most 200 new profiles/four minutes per daily run; existing proofs are cached.
+The initial verified set primarily covers the top 300 per tour. Coverage can grow
+on subsequent runs; unverified players remain explicitly unknown. Links use
+namespaced IDs, not a fresh name-only join on every build.
+
+Only the current publication receives this prior:
+
+`adjustment = clamp(0.35 * (rank_seed - result_strength), -200, +200)`
+
+Add that adjustment to result strength and availability-adjusted score before
+sorting. The same adjustment applies across surfaces; it is **not** surface
+evidence. Ranking points are displayed but are never added directly as Elo points.
+Unknown/unverified ranks receive no invented prior. Future observations and
+observations older than 14 days are ineligible. Failed refreshes retain their true
+last-successful observation date, not a falsely updated timestamp.
+
+TennisONE does not supply an edition date, so dates are labelled **observed**, not
+official weekly editions. Historical replay, pre-date opponent categories and
+walk-forward predictions do not use today's prior. Seven-day movements are
+withheld for the blended publication because comparable prior-adjusted past ranks
+have not been recorded. The historical evaluation tests only the result component,
+not the new current-rank blend.
+
 ## Surface partial pooling
 
-Hard, clay, grass and carpet have separate anchor/form updates. Surface expectation
+Outdoor hard, indoor hard, clay and grass have separate anchor/form updates. Surface expectation
 uses partially pooled strength. With `n` covered matches on that surface, blend
 `n / (n + 12)` of surface-specific evidence with overall strength. Fewer than 12
 matches is explicitly provisional; a no-match surface rating is a pooled estimate,
 not proof of performance. Unknown surface is counted separately and does not update
-an invented hard/clay/grass anchor. Indoor/outdoor is not a separate surface here.
+an invented surface anchor. The current CSV explicitly distinguishes `dur` from
+`dur intérieur`. Generic historical `Hard` without an explicit indoor/outdoor flag
+stays unknown; event names are not used to guess conditions. Carpet matches are
+excluded from ratings, records, eligibility and backtests, not merely hidden in UI.
 
 ## Availability and injuries
 

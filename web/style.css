@@ -12,3 +12,7 @@
 .published-scroll { max-height: 480px; overflow: auto; margin-top: 20px; }
 #published-rankings { margin-top: 56px; }
 #published-search { min-height: 44px; }
+.surface-dot.outdoor-hard,.surface-dot.outdoor.hard { background: #577c96; }
+.surface-dot.indoor-hard,.surface-dot.indoor.hard { background: #79618e; }
+.surface-ranks { flex-wrap: wrap; }
+@media(max-width:650px){.surface-tabs{flex-wrap:wrap}.surface-tabs button:last-child{display:inline-flex}}

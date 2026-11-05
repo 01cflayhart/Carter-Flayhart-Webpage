@@ -10,7 +10,7 @@ from tennis.engine import (State, build, category, expected, normalize, parse_da
 CONFIG = json.loads((Path(__file__).resolve().parents[1] / "config.json").read_text())
 
 
-def match(day="20260105", w="1", l="2", wr=10, lr=100, surface="Hard", score="6-3 6-4", event=None, **kwargs):
+def match(day="20260105", w="1", l="2", wr=10, lr=100, surface="Outdoor hard", score="6-3 6-4", event=None, **kwargs):
     return dict(tourney_id=event or day + "-event", tourney_name="Test Open", tourney_date=day,
                 winner_id=w, loser_id=l, winner_name="Player " + w, loser_name="Player " + l,
                 winner_rank=str(wr) if wr else "", loser_rank=str(lr) if lr else "", winner_age="20.0", loser_age="36.0",
@@ -155,7 +155,55 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(statistics(p["history"],date(2026,2,28),"atp",True)["overall"],[1,0])
         stats=p["stats"]["atp"]["year"]
         self.assertEqual(sum(sum(stats[k]) for k in ("similar","better","worse","unknown")),sum(stats["overall"]))
-        self.assertEqual(sum(sum(stats[k]) for k in ("Hard","Clay","Grass","Carpet","Unknown")),sum(stats["overall"]))
+        self.assertEqual(sum(sum(stats[k]) for k in ("Outdoor hard","Indoor hard","Clay","Grass","Unknown")),sum(stats["overall"]))
+
+    def test_carpet_excluded_and_unspecified_hard_not_inferred(self):
+        rows,audit=normalize([match(surface='Carpet'),match(surface='Hard',event='unspecified')])
+        self.assertEqual(audit['carpet_excluded'],1)
+        self.assertEqual(rows[0]['surface'],'Unknown')
+        self.assertEqual(normalize([match(surface='Hard',indoor=True)])[0][0]['surface'],'Indoor hard')
+        self.assertEqual(normalize([match(surface='Hard',indoor=False)])[0][0]['surface'],'Outdoor hard')
+
+    def test_indoor_and_outdoor_hard_have_independent_evidence(self):
+        rows,_=normalize([match(surface='Indoor hard'),match(day='20260112',surface='Outdoor hard')])
+        publication,_,_=build(rows,{},CONFIG,date(2026,1,12))
+        p=publication['players'][0]
+        self.assertEqual(set(p['surfaces']),{'Indoor hard','Outdoor hard','Clay','Grass'})
+        for surface in ('Indoor hard','Outdoor hard'):
+            self.assertEqual(p['surfaces'][surface]['matches'],1)
+            self.assertEqual(p['stats']['power']['year'][surface],[1,0])
+
+    def test_event_weights_scale_both_anchor_and_form_but_not_wl(self):
+        main=None
+        for level,round_name,weight in [('A','F',1),('A','Q1',.4),('C','F',.3),('C','Q1',.15),('15','F',.08),('15','Q1',.04)]:
+            row=match();row.update(tourney_level=level,round=round_name)
+            states,_,history,*_=replay(normalize([row])[0],CONFIG,date(2026,1,5))
+            changes=(states['1'].anchor-seed(10),states['1'].sums['Overall'])
+            if main is None:main=changes
+            for actual,baseline in zip(changes,main):self.assertAlmostEqual(actual,baseline*weight)
+            self.assertEqual(statistics(history['1'],date(2025,1,5),'power')['overall'],[1,0])
+            self.assertAlmostEqual(history['1'][0]['event_weight'],weight)
+
+    def test_current_rank_prior_changes_current_order_not_historical_evidence(self):
+        rows,_=normalize([match(wr=None,lr=None)])
+        baseline,snapshots,predictions=build(rows,{},CONFIG,date(2026,1,5))
+        ranks={'1':{'rank':1000,'points':1,'observed_at':'2026-01-05T00:00:00Z'},
+               '2':{'rank':1,'points':10000,'observed_at':'2026-01-05T00:00:00Z'}}
+        changed,after_snapshots,after_predictions=build(rows,{},CONFIG,date(2026,1,5),current_rankings=ranks)
+        self.assertEqual(baseline['players'][0]['id'],'1')
+        self.assertEqual(changed['players'][0]['id'],'2')
+        self.assertEqual(snapshots,after_snapshots);self.assertEqual(predictions,after_predictions)
+        original={p['id']:p for p in baseline['players']}
+        for p in changed['players']:
+            self.assertEqual(p['history'],original[p['id']]['history'])
+            self.assertEqual(p['stats'],original[p['id']]['stats'])
+            self.assertIsNone(p['movement'])
+            self.assertLessEqual(abs(p['official_adjustment']),200)
+            for surface in p['surfaces']:
+                self.assertAlmostEqual(p['surfaces'][surface]['rating']-original[p['id']]['surfaces'][surface]['rating'],p['official_adjustment'],places=1)
+        ranks['1']['observed_at']='2026-01-06T00:00:00Z';ranks['2']['observed_at']='2026-01-06T00:00:00Z'
+        future=build(rows,{},CONFIG,date(2026,1,5),current_rankings=ranks)[0]
+        self.assertEqual(future['players'],baseline['players'])
 
     def test_sourced_health_and_missing_photo_validation(self):
         rows,_=normalize([match()])

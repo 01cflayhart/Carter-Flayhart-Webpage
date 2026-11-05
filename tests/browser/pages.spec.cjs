@@ -93,11 +93,12 @@ test('CV, Contact, hobbies and newest-first talks use supplied information',asyn
 });
 test('published rankings are dated, searchable, and tour-isolated',async({page})=>{
  await page.goto('/sports/tennis/?tour=ATP');
- await expect(page.locator('#published-source')).toContainText('ATP rankings via ESPN');
+  await expect(page.locator('#published-source')).toContainText('ATP rankings via TennisONE');
+  await expect(page.locator('#published-source')).toContainText('edition date not supplied');
  await expect(page.locator('#published-body tr')).toHaveCount(50);
  await page.locator('#published-search').fill('Sinner');await expect(page.locator('#published-body')).toContainText('Jannik Sinner');await expect(page.locator('#published-body tr')).toHaveCount(1);
  await page.locator('#wta').click();
- await expect(page.locator('#published-source')).toContainText('WTA official rankings');await expect(page.locator('#published-search')).toHaveValue('');
+  await expect(page.locator('#published-source')).toContainText('WTA rankings via TennisONE');await expect(page.locator('#published-search')).toHaveValue('');
  await expect(page.locator('#published-body tr')).toHaveCount(50);await expect(page.locator('#published-body')).not.toContainText('Jannik Sinner');
  await page.locator('#published-search').fill('Rybakina');await expect(page.locator('#published-body')).toContainText('Elena Rybakina');
  await page.locator('#published-search').fill('');await page.locator('#published-more').click();await expect(page.locator('#published-body tr')).toHaveCount(100);
@@ -118,17 +119,29 @@ test('static Pages ATP/WTA work without a Python API and remain isolated',async(
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('/sports/tennis/?tour=ATP');await expect(page.locator('#table-body tr')).toHaveCount(25);
  await expect(page.locator('#freshness')).toContainText('Separate ATP');
- await page.locator('#search').fill('Sinner');await expect(page.locator('#table-body tr')).toHaveCount(1);
- await page.getByRole('button',{name:'Open Jannik Sinner notebook'}).click();await expect(page.locator('#player-title')).toHaveText('Jannik Sinner');
+  await page.locator('#search').fill('Sinner');await expect(page.locator('#table-body tr')).toHaveCount(1);
+  const published=await(await page.request.get('/sports/tennis/official-rankings.json')).json();
+  const officialSinner=published.tours.ATP.rows.find(p=>p.name==='Jannik Sinner');
+  await expect(page.locator('#table-body')).toContainText(officialSinner.points.toLocaleString('en-US')+' pts');
+  await page.getByRole('button',{name:'Open Jannik Sinner notebook'}).click();await expect(page.locator('#player-title')).toHaveText('Jannik Sinner');
+  await expect(page.locator('#player-content')).toContainText('rank prior');
+  await expect(page.locator('#player-content')).toContainText('TennisONE observed');
+  await expect(page.locator('#profile-basis option[value="atp"]')).toHaveJSProperty('disabled',true);
  await page.locator('#result-mode').selectOption('0');await expect(page.locator('.match-card').first()).toBeVisible();
  const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
  await page.keyboard.press('Escape');await page.locator('#wta').click();await expect(page.locator('#freshness')).toContainText('Separate WTA');
- await expect(page.locator('#table-body tr')).toHaveCount(25);await expect(page.locator('#table-body')).not.toContainText('Jannik Sinner');
+  await expect(page.locator('#table-body tr')).toHaveCount(25);await expect(page.locator('#table-body')).not.toContainText('Jannik Sinner');
+  await expect(page.locator('[data-surface="Carpet"]')).toHaveCount(0);
+  for(const surface of ['Indoor hard','Outdoor hard']){
+   await page.locator(`[data-surface="${surface}"]`).click();await expect(page.locator('#result-count')).toContainText(surface);
+   await expect(page.locator('#table-body tr')).toHaveCount(25);
+  }
  await page.locator('[data-surface="Clay"]').click();await expect(page.locator('#result-count')).toContainText('Clay');
  await page.locator('#window').selectOption('recent');await expect(page.locator('#result-count')).toContainText('3-month');
  await page.locator('#filter-toggle').click();await page.locator('#no-ret').check();await page.locator('#expanded').check();await expect(page.locator('#table-head')).toContainText('vs similar');
  await page.locator('#coverage-open').click();await expect(page.locator('#info-content')).toContainText('CC BY 4.0');await page.keyboard.press('Escape');
- await page.locator('#method-open').click();await expect(page.locator('#info-content')).toContainText('not hidden');await page.keyboard.press('Escape');
+  await page.locator('#method-open').click();await expect(page.locator('#info-content')).toContainText('not hidden');
+  await expect(page.locator('#info-content')).toContainText('ITF 8%');await expect(page.locator('#info-content')).toContainText('35% blend');await page.keyboard.press('Escape');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
  await page.screenshot({path:'/tmp/opencode/pages-tennis-'+info.project.name+'.png'});expect(errors).toEqual([]);
 });

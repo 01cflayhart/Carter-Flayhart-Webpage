@@ -24,7 +24,22 @@ The build serves only `_site/`, never `.git`, raw CSVs, SQLite files, tokens or
 OpenCode/session configuration. Do not commit credentials. The Pages deploy uses
 GitHub's short-lived job token, not a long-lived personal token.
 
-## CarterFlayhart.com: pending registration
+## Requested free URL: CarterFlayhart.github.io
+
+GitHub Pages reserves `<owner>.github.io` for that GitHub account/organization.
+Changing a repository name or adding a CNAME cannot give `01cflayhart` the owner
+hostname `CarterFlayhart.github.io`. No existing public account/organization with
+that name was found on 5 November 2026; availability is ultimately checked by GitHub.
+
+The least disruptive path is to create a **free organization** named
+`CarterFlayhart` at https://github.com/organizations/plan, owned by the existing
+account. Then publish a public repository named `CarterFlayhart.github.io` in that
+organization with Pages enabled. Creation/account terms must be completed by the
+user. Do not rename the personal account, transfer this repository, duplicate
+automation, or claim the new URL is live without an explicit hosting decision.
+The current URL stays live meanwhile. Relative links support either location.
+
+## Optional future custom domain (not the current free-URL request)
 
 The user confirmed the domain is not registered. No purchase has been authorized
 or made. The site continues to work at its Pages URL until the user buys the domain
@@ -69,19 +84,19 @@ never joined to Sackmann IDs by names. Official ranks/points, birthdays, countri
 and images are absent from this CSV. No invented metadata or stale archive ranks
 are presented as current. Historical **power** categories are computed normally.
 
-Current ATP rankings reference supplied by the user:
-https://www.atptour.com/en/rankings/singles . Reviewed 2026-11-04; the site shows
-the weekly edition 2026-11-02. ATP terms §3 restrict public republication and §7
-requires written permission for systematic data/ranking retrieval. No scheduled
-ATP scraper, embedded ranking table, or permission bypass is included. A permitted
-official-rank integration and reviewed cross-provider identity mappings remain
-necessary before those columns can be populated from ATP. Same restriction should
-be checked separately for WTA. This is not legal advice or a claim of ATP approval.
+The user selected https://tennis.one/ranking for both tours. Daily workflow
+`website-data.yml` reads its unauthenticated public ranking-page feed and verifies
+new cross-provider IDs against public profile birth-date or country/tour facts.
+No name-only joins, private history endpoints or copied headshots are used. Source
+terms are separate from the CSV's CC BY license; no claim of ATP approval is made.
+Current ranks enter a bounded publication-time prior; they never relabel historical
+opponents. TennisONE has no edition date, so observation dates are labelled honestly.
+See METHODOLOGY.md and DATA_SOURCES.md for exact weighting and validation.
 
 The free CSV has substantial missing and partial scores and does not guarantee
 exhaustive coverage. Import excludes unplayed/unknown/incomplete outcomes rather
 than inventing set scores or guessing retirements. The per-tour audit ledger shows
 exclusions, source checksums and accepted coverage. The last accepted WTA match
-may predate the day the feed was checked. Source round codes are not reinterpreted
-as known qualifying rounds. Power ratings are experimental estimates of the
+may predate the day the feed was checked. Round codes 0–3 are qualifying (codes
+1/3/4 checked against public match-page labels). Power ratings are estimates of the
 **covered** matches, not definitive full-tour standings.

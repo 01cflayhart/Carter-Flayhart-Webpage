@@ -30,11 +30,15 @@ jobs:
         run: node scripts/refresh-cv.cjs
       - name: Refresh dated ATP and WTA ranking editions independently
         run: python -m tennis.official
+      - name: Prepare identity candidates from licensed result IDs
+        run: python -m tennis.identities
+      - name: Verify new player links against independent public profiles
+        run: node scripts/refresh-tennis-identities.cjs
       - name: Commit public snapshots and publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add site/assets/carter-flayhart-cv.pdf site/sports/tennis/official-rankings.json
+          git add site/assets/carter-flayhart-cv.pdf site/sports/tennis/official-rankings.json site/sports/tennis/identities.json
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

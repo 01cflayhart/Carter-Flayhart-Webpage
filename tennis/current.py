@@ -17,7 +17,7 @@ from .engine import build, normalize, parse_date
 from .update import ROOT, atomic_json, fetch, now, read_json
 from .backtest import metrics
 
-SURFACE = {"dur": "Hard", "dur intérieur": "Hard", "terre battue": "Clay",
+SURFACE = {"dur": "Outdoor hard", "dur intérieur": "Indoor hard", "terre battue": "Clay",
            "gazon": "Grass", "moquette intérieur": "Carpet"}
 LEVEL = {"Challenger": "C", "Main tour": "A", "Masters": "M", "Grand Chelem": "G",
          "Coupe Davis / BJK Cup": "D", "ITF": "15"}
@@ -31,6 +31,9 @@ def adapt(rows, tour, through):
         day = parse_date(r["date"][:10])
         if day > through:
             audit["after_cutoff"] += 1
+            continue
+        if r.get('surface') == 'moquette intérieur':
+            audit['carpet_excluded'] += 1
             continue
         mid = r["match_id"]
         if not mid or not r["tournoi_id"]:
@@ -61,7 +64,8 @@ def adapt(rows, tour, through):
                 wins[0 if x > y else 1] += 1
         # The CSV gives no reliable qualifying-round map. Conservatively omit
         # two-set men's Slam qualifying rather than mislabel incomplete main draws.
-        needed = 3 if tour == "ATP" and r["categorie"] == "Grand Chelem" else 2
+        qualifying = r['categorie'] != 'Coupe Davis / BJK Cup' and r['tour'] in ('0','1','2','3')
+        needed = 3 if tour == "ATP" and r["categorie"] == "Grand Chelem" and not qualifying else 2
         winner_side = 0 if w == a else 1
         if not retired and (wins[winner_side] != needed or wins[1-winner_side] >= needed):
             audit["incomplete_or_ambiguous_score"] += 1
@@ -73,7 +77,7 @@ def adapt(rows, tour, through):
         level = "15" if re.match(r"^[MW]\d+\b", r["tournoi"]) else LEVEL[r["categorie"]]
         result.append({"tourney_id": prefix+r["tournoi_id"], "tourney_name": r["tournoi"],
                        "tourney_date": day.isoformat(), "match_date": day.isoformat(),
-                       "source_match_id": prefix+mid, "round": "Source round "+r["tour"],
+                       "source_match_id": prefix+mid, "round": ('Q' if qualifying else 'Source round ')+r["tour"],
                        "winner_id": prefix+w, "loser_id": prefix+(b if w == a else a),
                        "winner_name": r["joueur1"] if w == a else r["joueur2"],
                        "loser_name": r["joueur2"] if w == a else r["joueur1"],
@@ -125,12 +129,14 @@ def update(root=ROOT, offline=False, through=None):
     try:
         rows, manifest = download(root, source, through, offline)
         publications = {}
+        from .identities import linked_rankings
         for tour in ("ATP", "WTA"):
             adapted, audit = adapt(rows, tour, through)
             matches, normalized = normalize(adapted)
             if not matches:
                 raise ValueError(f"No usable {tour} matches")
-            snapshot, _, predictions = build(matches, {}, {"rating": rating}, through)
+            current_ranks, identity_coverage = linked_rankings(root, tour, through)
+            snapshot, _, predictions = build(matches, {}, {"rating": rating}, through, current_rankings=current_ranks)
             latest = max(m["day"] for m in matches)
             coverage = {}
             for m in matches:
@@ -142,16 +148,22 @@ def update(root=ROOT, offline=False, through=None):
             snapshot.update(tour=tour, generated_at=now(), source=dict(source, revision=revision),
                 historical=False, latest_result=latest.isoformat(), manifest=manifest,
                 audit=dict(audit, **normalized), coverage=coverage, rating_config=rating,
-                official_rankings_available=False, date_precision="Source-reported UTC match dates; same-date ratings frozen before all outcomes.",
+                official_rankings_available=bool(current_ranks), historical_official_rankings_available=False,
+                official_power_prior=bool(current_ranks), official_identity_coverage=identity_coverage,
+                official_observed_at=identity_coverage.get('observed_at'),
+                date_precision="Source-reported UTC match dates; same-date ratings frozen before all outcomes.",
                 warnings=["Open results feed checked through "+through.isoformat()+"; latest accepted "+tour+" result "+latest.isoformat()+". Coverage is not certified exhaustive.",
-                    "Official ranks, points, birth dates, countries, photos and injuries are not supplied by this CSV. No June archive identities or ranks have been mixed in.",
-                    "Unfinished, missing and ambiguous scores are excluded. Unmarked retirements and two-set men's Slam qualifying may be omitted; source round numbers are preserved without guessing.",
+                    f"Current TennisONE ranks/points are linked for {len(current_ranks)} players via independently checked profile metadata. Unverified players remain unknown. No old archive identities are mixed in.",
+                    "TennisONE provides no ranking edition date. Observations up to 14 days old can supply a bounded current-rank prior, never historical match ranks or a historical backtest feature.",
+                    "Unfinished, missing and ambiguous scores are excluded. Source rounds 0–3 are qualifying; tour qualifying carries 40% weight, Challenger qualifying 15%, and ITF qualifying 4%.",
+                    "Tour main draws carry 100% rating influence, Challengers 30%, ITF 8%, and team events 50%. Both long-term anchor and recent-form changes are weighted. Raw W–L counts are not weighted.",
+                    "Outdoor hard and indoor hard are separate. Carpet is excluded entirely; hard courts without a verified setting are unknown, not guessed.",
                     "Sources classify some women's ITF events as Challenger; events explicitly named M/W followed by a prize tier are classified as ITF.",
                     "Scheduled UTC starts are not verified completion timestamps. No result from later today is inferred. Provisional model; not an independent final holdout."])
             evaluation = [p for p in predictions if p["date"] > snapshot["window_start_exclusive"] and not p["retired"]]
             snapshot["backtest"] = {"start_exclusive": snapshot["window_start_exclusive"], "end_inclusive": through.isoformat(),
                 "all_played_sample": {n: metrics(evaluation, n) for n in ("model", "elo")},
-                "method": "Walk-forward frozen-date replay of the open feed. No official-rank baseline available; provisional, not an untouched holdout."}
+                "method": "Walk-forward frozen-date replay of result-based scores only, excluding the current TennisONE prior. No historical official-rank baseline available; provisional, not an untouched holdout."}
             publications[tour] = snapshot
         # Both tours must validate before either is offered to the exporter.
         for tour, snapshot in publications.items():

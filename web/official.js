@@ -17,9 +17,10 @@
       more.hidden = true;
       return;
     }
-    const stale = Date.now() - new Date(item.edition + 'T00:00:00Z').getTime() > 10 * 86400000;
-    source.innerHTML = `<a href="${safeURL(item.source_url)}" target="_blank" rel="noreferrer">${esc(item.source_name)}</a> · Edition ${fmtDate(item.edition)} · Retrieved ${esc(item.checked_at.slice(0, 10))}. ${esc(item.coverage)}.${item.ok === false ? ' Last refresh failed; showing the last validated edition.' : ''}${stale ? ' This edition is more than ten days old.' : ''}`;
-    document.querySelector('#official-date').textContent = fmtDate(item.edition);
+    const day = item.edition || item.checked_at.slice(0,10);
+    const stale = Date.now() - new Date(day + 'T00:00:00Z').getTime() > 10 * 86400000;
+    source.innerHTML = `<a href="${safeURL(item.source_url)}" target="_blank" rel="noreferrer">${esc(item.source_name)}</a> · ${item.edition?'Edition '+fmtDate(item.edition):'Observed '+fmtDate(day)+'; edition date not supplied'} · Retrieved ${esc(item.checked_at.slice(0, 10))}. ${esc(item.coverage)}.${item.ok === false ? ' Last refresh failed; showing the last validated snapshot.' : ''}${stale ? ' This snapshot is more than ten days old.' : ''} ${esc((item.warnings||[]).join(' '))}`;
+    document.querySelector('#official-date').textContent = fmtDate(day);
     document.querySelector('#official-caption').innerHTML = `<a href="#published-rankings">${esc(item.source_name)} ↓</a>`;
     const query = search.value.trim().toLocaleLowerCase();
     const matches = item.rows.filter(row => `${row.name} ${row.country}`.toLocaleLowerCase().includes(query));

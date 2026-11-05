@@ -13,7 +13,7 @@
   }
   const category=(a,b)=>a==null||b==null?'unknown':Math.abs(a-b)<=25?'similar':b<a?'better':'worse';
   function stats(history,cutoff,basis,noRet,surface='Overall'){
-    const s=Object.fromEntries(['overall','top50','similar','better','worse','unknown','Hard','Clay','Grass','Carpet','Unknown'].map(k=>[k,[0,0]]));
+    const s=Object.fromEntries(['overall','top50','similar','better','worse','unknown','Outdoor hard','Indoor hard','Clay','Grass','Unknown'].map(k=>[k,[0,0]]));
     for(const r of history){
       if(r.date<=cutoff||(noRet&&r.retired)||(surface!=='Overall'&&r.surface!==surface))continue;
       const keys=['overall',category(r['own_'+basis],r['opp_'+basis]),r.surface];
