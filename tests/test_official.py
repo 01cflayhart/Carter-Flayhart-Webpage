@@ -1,6 +1,8 @@
 import copy
+from contextlib import redirect_stdout
 from datetime import date, timedelta
 import json
+from io import StringIO
 from pathlib import Path
 import tempfile
 import unittest
@@ -59,7 +61,7 @@ class OfficialRankingTests(unittest.TestCase):
         with self.assertRaises(ValueError): validate(broken, EDITION)
 
     def test_independent_failure_preserves_last_valid_edition(self):
-        with tempfile.TemporaryDirectory() as temp:
+        with tempfile.TemporaryDirectory() as temp, redirect_stdout(StringIO()):
             before = update(temp, fetcher)
             def broken_atp(url):
                 if url == ATP_URL: raise OSError('Unavailable')
