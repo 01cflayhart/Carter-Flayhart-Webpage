@@ -39,6 +39,9 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git commit -m 'Refresh CV and published tennis rankings'
+            # Other scheduled jobs or edits may have landed during the browser
+            # refresh. Rebase only this bot commit; never force-push over them.
+            git pull --rebase origin main
             git push
             gh workflow run pages.yml --ref main
           fi
