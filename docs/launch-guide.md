@@ -15,17 +15,55 @@ Commands below use bash/WSL from the repository root, with Git, Node.js 22+ and 
 - [x] D1 database `carter-site-activity` exists. Its UUID is `3278b8b6-09b9-4b0f-8abe-92d18f722985` (an identifier, not a credential).
 - [x] Local `wrangler.jsonc` generated in the website repository using that verified UUID. Git ignores this file. **The failed configuration command has now been completed for you.**
 - [ ] Your terminal's exported variable cannot be verified from this separate agent shell. This is no longer a blocker: the local configuration is generated, and GitHub Actions will use its own repository variable.
-- [ ] Section 2: reported complete by Carter. Independent verification is blocked because GitHub is not authenticated in this agent environment. Confirm the two secret names, the variable value, and workflow permissions using the checks below; no need to recreate them if correct. Secret values cannot be read back from GitHub.
+- [x] GitHub authentication and push completed. The agent can now inspect workflow runs and settings. Both Cloudflare secret names are present, the D1 repository variable matches, and default workflow permissions are `write`.
+- [ ] Section 2 authorization is **not yet fully working**: the push-triggered Cloudflare run failed with API error **7403**, and a retry still failed after the agent reset `CLOUDFLARE_ACCOUNT_ID` to the independently verified account ID. The remaining manual blocker is to check/replace the API token and its account permissions/resources, then rerun. GitHub cannot reveal its saved secret value.
 - [x] Production D1 migration `0001_analytics.sql` applied successfully using the existing Cloudflare login. The analytics and rate-limit tables are created; do not recreate the database.
 - [x] Initial Cloudflare production deployment completed. Live GET checks passed for the home page, CV PDF, sports hub and both tennis datasets. Anonymous owner APIs return 401; private login remains unavailable until its secrets are configured. No feedback mail or synthetic analytics events were submitted during verification.
 - [x] Launch source committed locally on `main`, with the latest remote publication/ranking updates incorporated without discarding them. Generated assets, local configuration and credentials were excluded. A final documentation commit records the launch status.
-- [ ] Section 3: authenticate GitHub in WSL if needed, push the prepared local launch commits, and confirm the **GitHub Actions** Cloudflare deployment succeeds. The successful local deployment does **not** verify the saved GitHub API token, repository variable or workflow permissions.
+- [x] Section 3 source push completed. GitHub registers **Publish to Cloudflare Pages** as active and automatically ran it on the push. An early credential/resource preflight has been added so authorization errors are reported before the expensive build. Source/guide corrections are committed and pushed by the agent.
+- [ ] Confirm a successful **GitHub Actions** Cloudflare deployment after fixing the API token. The earlier successful local OAuth deployment does **not** prove the separate GitHub Actions API token works.
 - [ ] Section 4: configure owner-login secrets. The Pages production secret list is currently empty.
 - [ ] Section 5: optional email sender configuration; no Pages production secrets are present yet.
 - [ ] Section 6: verify the live website, authorization, activity counts and actual feedback delivery.
 - [ ] Sections 7–8: optional odds account connection and search-engine verification/indexing.
 
-**Next manual step: confirm the Section 2 settings below, then follow Section 3's WSL terminal authentication/push instructions.** After a successful GitHub Actions deployment, continue at Section 4 for owner login and Section 5 for optional email. Do not recreate the existing project or database. The existing GitHub Pages site has not been removed. These are point-in-time checks, not claims that future steps are complete.
+**Next manual step: follow “Current blocker: Cloudflare API token authorization” below. No additional terminal push is needed for the changes made by this session.** After a successful GitHub Actions deployment, continue at Section 4 for owner login and Section 5 for optional email. Do not recreate the existing project or database. The existing GitHub Pages site has not been removed. These are point-in-time checks, not claims that future steps are complete.
+
+### Finding the workflow you could not see
+
+Open this exact URL while signed into GitHub as 01cflayhart:
+
+<https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml>
+
+This is the existing workflow page, **not** the **New workflow** template chooser. GitHub's API confirms the workflow is active; its push-triggered run exists at <https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42296280142>. It is therefore not missing from the repository. The exact reason your previous Actions view did not show it could not be established from here; a stale page, a workflow filter or a different repository view may hide it. Use the direct link instead of searching the sidebar, and refresh the page if needed.
+
+The page should be titled **Publish to Cloudflare Pages**. Its **Run workflow** button lets you select **Branch: main**, then **Run workflow**. Click a run's title to see its job/step results. A red run is a failed deployment, not evidence that the workflow was never installed.
+
+### Current blocker: Cloudflare API token authorization
+
+The original run and retry both reached the Cloudflare API and failed at D1 access with:
+
+```text
+The given account is not valid or is not authorized to access this service [code: 7403]
+```
+
+The agent verified the account through Wrangler's independent OAuth login and set GitHub secret `CLOUDFLARE_ACCOUNT_ID` to `3dcedb17c6e768707f97f3f0c5a3f088`. The D1 UUID repository variable and GitHub workflow permissions were also verified. The same failure persisted on retry. The encrypted token value and its Cloudflare policy cannot be read back from GitHub, so the exact token defect cannot be established here. Possibilities include a wrong/expired/revoked token, missing D1 access, or a policy scoped to another account. Do **not** delete the database, recreate the Pages project or change working local OAuth login to fix this.
+
+Complete these steps in the **Cloudflare and GitHub websites**, not the terminal:
+
+1. In Cloudflare, open your profile → **API Tokens** → **Create Token** → **Create Custom Token**. Create a dedicated replacement such as `Carter GitHub Pages and D1`.
+2. Under permissions choose **Account policy**. Add **both** rows (use **Add more** for the second):
+   - **Account → Cloudflare Pages → Edit**
+   - **Account → D1 → Edit**
+   Do not substitute Zone or User policies, or Read-only permissions.
+3. Under **Account Resources**, select **Include → Specific account → Carter.flayhart@gmail.com's Account**. Confirm it is account `3dcedb17c6e768707f97f3f0c5a3f088`, the account containing `carterflayhart` and `carter-site-activity`.
+4. Leave **Client IP Address Filtering** blank for this test: GitHub-hosted runners do not use your home/WSL IP. If using an expiration, make sure the token is currently valid and has not expired.
+5. Select **Continue to summary**, check both Account/Edit permissions and the account resource, then **Create Token**. Copy the actual newly displayed **token value**—not its name or ID, a Global API Key, an OAuth code, or an account ID. Do not add quotes or a `Bearer ` prefix. Never send it in chat.
+6. Open <https://github.com/01cflayhart/Carter-Flayhart-Webpage/settings/secrets/actions>. Under **Repository secrets**, click the edit/pencil control beside **CLOUDFLARE_API_TOKEN**. Replace its value with the new token and save. Do **not** add it under Variables or an unreferenced Environment instead.
+7. Open the [direct workflow page](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml). Select **Run workflow → main → Run workflow**. Updating a secret alone does **not** trigger a run. You do not need another Git push just to change a secret.
+8. Confirm **Verify Cloudflare account and resource access**, the migration step, and **Deploy static assets and protected Pages Functions** all succeed. “No migrations to apply” is fine; the tables already exist. A skipped deploy or failed preflight is not success. If it still fails, send only the **run URL/error code**—never the token. Once the replacement works, revoke an old token only if you know it has no other consumers.
+
+The preflight makes a read-only `SELECT 1` D1 query and checks the existing Pages project, without printing credentials or API response bodies. The actual deployment separately validates Pages write access. The live website stays on its previous successful deployment when an Actions run fails.
 
 ### Why the configuration command failed, and how to run it correctly
 
@@ -93,7 +131,7 @@ The Cloudflare workflow checks all three settings, builds the website, applies p
 
 ### Check whether Section 2 is complete
 
-These are **GitHub website** checks, not terminal commands. The agent cannot currently inspect your private GitHub settings because no GitHub login is available here:
+These are **GitHub website** checks, not terminal commands. The agent has now verified the secret names, D1 variable value and default workflow permissions. Secret values remain deliberately unreadable; the actual API token has not yet passed deployment authorization:
 
 1. Open <https://github.com/01cflayhart/Carter-Flayhart-Webpage/settings/secrets/actions>. Under **Repository secrets**, confirm that `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are listed. GitHub deliberately does not reveal their saved values. Do not send the token in chat.
 2. Open <https://github.com/01cflayhart/Carter-Flayhart-Webpage/settings/variables/actions>. Confirm `CLOUDFLARE_D1_DATABASE_ID` is a **repository variable** with value `3278b8b6-09b9-4b0f-8abe-92d18f722985`.
@@ -102,7 +140,7 @@ These are **GitHub website** checks, not terminal commands. The agent cannot cur
 
 ## 3. Publish the source changes
 
-The launch work has already been committed locally by this session, including a documentation update recording the initial live deployment. GitHub authentication and push are still your manual steps. Do not include `.env*`, `.dev.vars*`, `wrangler.jsonc`, caches, or generated `_site/`; these are ignored. The maintained `wrangler.jsonc.example` is safe to commit; it contains only a placeholder database ID.
+**Already completed for this launch:** GitHub authentication and the source push have succeeded, and the workflow has run. The agent also pushes the subsequent preflight/guide fixes. You do not need to repeat these steps to fix the Cloudflare API token; change the GitHub secret and run the existing workflow instead. The instructions below are retained for future source edits or a new terminal setup. Do not include `.env*`, `.dev.vars*`, `wrangler.jsonc`, caches, or generated `_site/`; these are ignored. The maintained `wrangler.jsonc.example` is safe to commit; it contains only a placeholder database ID.
 
 **Where to type the push:** use your **Ubuntu/WSL terminal**, the same kind of terminal where you ran `npx` and `export`. Do not type Git commands in Cloudflare's website, GitHub's website, a browser address bar or the Node.js interactive prompt. The terminal can initially be in `/home/carter`; the first command below moves it to the correct website folder.
 
@@ -142,7 +180,7 @@ If GitHub rejects a workflow-file push because the OAuth token lacks `workflow` 
 
 If the push is rejected because `main` has newer remote commits, run `git status` first. With a clean working tree, run `git pull --rebase origin main`, then `git push origin main`. If conflicts are reported, stop and ask for help; do not force-push, reset or discard files.
 
-On GitHub open **Actions → Publish to Cloudflare Pages → Run workflow → main** if the push did not already start it. Wait for a green deployment, not merely a skipped job. Keep the original GitHub Pages workflow enabled during this transition.
+Open <https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml> → **Run workflow → main** if the push did not already start it. Wait for a green deployment, not merely a skipped job. Keep the original GitHub Pages workflow enabled during this transition.
 
 The first deployment can be public before owner sign-in/email are configured. Those features fail closed. Subsequent publication/CV/ranking updates dispatch both hosting workflows; Cloudflare also refreshes every six hours. GitHub schedules can be delayed.
 
@@ -217,6 +255,8 @@ Submit `https://carterflayhart.pages.dev/sitemap.xml` in each service. Request i
 
 ## Troubleshooting
 
+- **Cannot find “Publish to Cloudflare Pages” in Actions:** use the direct workflow URL above, not **New workflow**. This workflow exists and is active; a push-triggered run already failed at Cloudflare authorization. Refresh/check the repository and filters instead of creating another deployment workflow.
+- **Cloudflare 7403:** see the current-blocker token replacement steps above. Account ID has been independently checked/reset; D1 access still fails with the saved API token. A working local Wrangler OAuth login does not grant access to a different API token stored in GitHub.
 - **`Cannot find module '/home/carter/scripts/configure-cloudflare.cjs'`:** the terminal is in your home folder, not the repository. Run `cd /mnt/c/Users/Carte/Website`, then retry. See the exact recovery commands above. Cloudflare-wide commands such as `whoami` can work from your home folder, which is why earlier steps succeeded there.
 - **`Set CLOUDFLARE_D1_DATABASE_ID to the database UUID`:** the variable is missing in this terminal or contains the placeholder. Re-export the actual UUID in this same terminal or use the one-line absolute-path command above. Do not reinstall Node.
 - **Workflow skipped:** check both GitHub secrets and the D1 repository **variable**, then run again. Dashboard runtime secrets belong to Pages, not GitHub Actions.

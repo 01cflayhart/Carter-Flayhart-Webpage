@@ -5,6 +5,7 @@ import { onRequest as api } from '../functions/api/[[path]].js';
 import { onRequest as privatePage } from '../functions/private.js';
 import { setupChecks } from '../functions/_lib/setup.js';
 import configure from '../scripts/configure-cloudflare.cjs';
+import cloudflareAccess from '../scripts/check-cloudflare-access.cjs';
 
 const env = { SESSION_SECRET: 'test-only-long-secret-never-use-in-production', GITHUB_OWNER_ID: '168453384' };
 const request = (path, options={}) => new Request('https://carterflayhart.pages.dev'+path, options);
@@ -61,6 +62,24 @@ test('Cloudflare config requires a real UUID and never serializes environment se
   const config=configure.configuration({CLOUDFLARE_D1_DATABASE_ID:'12345678-1234-1234-1234-123456789abc',CLOUDFLARE_API_TOKEN:'do-not-expose'});
   assert.equal(config.d1_databases[0].binding,'DB');assert.equal(config.vars.SITE_ORIGIN,'https://carterflayhart.pages.dev');
   assert.doesNotMatch(JSON.stringify(config),/do-not-expose|CLOUDFLARE_API_TOKEN/);
+});
+test('Cloudflare CI preflight uses only resource lookups and a read-only query',async()=>{
+  const credentials={CLOUDFLARE_API_TOKEN:'synthetic-private-token',CLOUDFLARE_ACCOUNT_ID:'a'.repeat(32),CLOUDFLARE_D1_DATABASE_ID:'12345678-1234-1234-1234-123456789abc'};
+  const requests=[];
+  await cloudflareAccess.checkAccess(credentials,async(url,options)=>{
+    requests.push({url,options});assert.equal(options.headers.Authorization,'Bearer synthetic-private-token');
+    return {ok:true,status:200,async json(){return {success:true};}};
+  });
+  assert.equal(requests.length,2);assert.equal(requests[0].options.method,'POST');
+  assert.deepEqual(JSON.parse(requests[0].options.body),{sql:'SELECT 1 AS ready'});
+  assert.equal(requests[1].options.method,'GET');assert.match(requests[1].url,/\/pages\/projects\/carterflayhart$/);
+  await assert.rejects(cloudflareAccess.checkAccess({...credentials,CLOUDFLARE_ACCOUNT_ID:'wrong'}),/32-character/);
+  await assert.rejects(cloudflareAccess.checkAccess(credentials,async()=>({ok:false,status:403,async json(){return {success:false,errors:[{code:7403,message:'synthetic-private-token'}]};}})),error=>{
+    assert.match(error.message,/7403/);assert.match(error.message,/D1 Edit/);assert.doesNotMatch(error.message,/synthetic-private-token/);return true;
+  });
+  await assert.rejects(cloudflareAccess.checkAccess(credentials,async()=>{throw new Error('synthetic-private-token');}),error=>{
+    assert.match(error.message,/could not reach/);assert.doesNotMatch(error.message,/synthetic-private-token/);return true;
+  });
 });
 test('missing credentials fail closed and OAuth state is mandatory',async()=>{
  assert.equal((await api({request:request('/api/auth/start'),env})).status,503);
