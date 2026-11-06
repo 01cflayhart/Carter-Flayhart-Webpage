@@ -1,74 +1,78 @@
-# Remaining launch steps: finish search verification
+# Remaining launch steps: profile link, Google follow-up and Bing
 
-**Your next manual action is clicking Verify in Google Search Console. No file moving, terminal commands or Git push is needed from you.**
+**Next manual action: add the website to your GitHub profile using Step 1 below. Then continue with Bing; Google's indexing-request quota does not block that work. No terminal commands or Git push are needed from you.**
 
-The agent copied `google5f578c920a2f92ee.html` byte-for-byte from Downloads into `site/`, left the original intact, committed/pushed it, and [deployed it successfully](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42308201453). The exact URL below has been checked live: HTTP 200, no redirect or login, and unchanged content. Your verification URL is:
+The agent rechecked the live Google verification file (exact URL, unchanged bytes, HTTP 200), sitemap XML, sitemap declaration in `robots.txt`, and home-page canonical/indexability directives. These checks pass. **Carter has confirmed actual receipt of the feedback test email.** Do not repeat email setup or send another test just for this guide.
 
-**<https://carterflayhart.pages.dev/google5f578c920a2f92ee.html>**
+You report that Google's **Test live URL** succeeded. Your **Request indexing** attempt was rejected because of the daily quota, so an accepted manual indexing request has **not** been verified. This is not a deployment failure. Your private Search Console ownership and sitemap-submission statuses are not readable through the agent's current connection; the public file alone is not proof of Google's account-side verification. Step 2 describes the one-time status confirmation and quota follow-up, not a repeat of setup.
 
-Login/email settings and the actual deployment have been checked. The live sign-in redirect is correct, anonymous owner APIs return 401, and one real feedback test was accepted by the website and Resend. **That proves provider acceptance, not inbox arrival.** Your reported owner-dashboard, exclusion/sign-out and inbox checks cannot be independently inspected from the agent's separate browser/session. If you completed them as reported, do not repeat them. If not, confirm using the [owner dashboard](https://carterflayhart.pages.dev/private), [Gmail](https://mail.google.com/mail/u/0/#inbox) for **carter.flayhart@gmail.com**, and [Resend email logs](https://resend.com/emails). The new test message begins `Launch verification by Carter website assistant`.
-
-**Do not recreate tokens, OAuth apps, databases or email keys. Do not change the session secret or delete the original GitHub Pages hosting.** The Resend sender remains a sandbox/test sender restricted to your own account email; provider acceptance is not production-sender approval. Keep the [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) if the provider does not permit the intended ongoing use. No purchase is required by this guide.
+**Keep the existing Google verification file and its exact-URL handler permanently. Do not recreate properties, tokens, OAuth applications, hosting, databases or email keys. Keep the original GitHub Pages hosting during the transition.** The Resend sender remains a sandbox/test sender restricted to your own account email; inbox receipt does not establish approval for ongoing production use. The free [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) remains available.
 
 Remaining work:
 
-- [ ] 1. Click Verify in Google Search Console.
-- [ ] 2. Submit the sitemap and request Google indexing.
+- [ ] 1. Add the website to your GitHub profile.
+- [ ] 2. Confirm Google's existing ownership/sitemap status; retry the optional indexing request later only if needed.
 - [ ] 3. Add/import the site into Bing and submit the sitemap.
-- [ ] 4. Optionally connect sportsbook prices. Prediction models remain separate work.
+- [ ] 4. Optionally connect sportsbook prices. Validated prediction models remain separate work.
 
-## 1. Finish Google ownership verification — web browser
+## 1. Add the website to your GitHub profile — web browser
 
-1. Return to the **Google Search Console tab that gave you the downloaded HTML file**. Stay signed into the same Google account that downloaded it.
-2. If you closed that tab, open **[Search Console for this website](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. In the top-left property selector, choose **`https://carterflayhart.pages.dev/`**. Do not choose the old GitHub Pages site or a Domain property for `pages.dev`.
-3. If the verification panel is not already open, choose the unverified property or open **[Ownership verification](https://search.google.com/search-console/ownership?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. Select the **HTML file** method. Do not download or generate a replacement file unless Google explicitly gives you a different filename for this account/property.
-4. The file to verify is **[google5f578c920a2f92ee.html](https://carterflayhart.pages.dev/google5f578c920a2f92ee.html)**. It should show exactly:
+The authenticated GitHub API currently reports your profile website field as empty. The agent attempted to update only that field, but GitHub refused because the existing authorization does not include profile-edit permission. **No profile changes were made.** There is no need to broaden CLI permissions or create a new token for this one field.
+
+1. Open **[GitHub → Public profile settings](https://github.com/settings/profile)** while signed in as **01cflayhart**.
+2. Find the profile **URL / Website** field. This is the website link associated with your public profile, not a repository URL or a social-account field. Scroll down if necessary.
+3. Paste exactly:
 
    ```text
-   google-site-verification: google5f578c920a2f92ee.html
+   https://carterflayhart.pages.dev
    ```
 
-   Publication and the exact URL have already been verified by the agent. Do not copy the file again, rename it or change its contents. If your browser unexpectedly shows a different result, share that error before changing the setup.
-5. In Google's verification panel, click **Verify**.
-6. Wait for **Ownership verified**, then click **Go to property** if offered.
+4. Click **Update profile** or the profile-save button on that page. Leave all other profile details unchanged.
+5. Open **[your public GitHub profile](https://github.com/01cflayhart)**. Refresh if needed, find the website link under your profile information, and click it to confirm it opens the website.
 
-**Done when:** Google confirms ownership. Publishing the file alone does not complete that account-side step. Keep `site/google5f578c920a2f92ee.html` permanently in the repository; Google rechecks it. Do not delete it after verification.
+**Done when:** the link is visible on the public profile and opens the production website. Tell the agent once saved; it can independently confirm the public profile/API value afterward. If the settings page differs, share only the field labels or a cropped screenshot of the non-secret profile form. Do not change account-security settings.
 
-If Google rejects verification, share the error text and the filename Google expects, not account passwords or cookies. Confirm the Google account and exact URL-prefix property before changing anything. [Official verification help](https://support.google.com/webmasters/answer/9008080).
+You can also link the site from academic profiles you control. Those edits are optional and require your choice; the agent has not modified them.
 
-## 2. Submit the sitemap and request indexing — web browser
+## 2. Google: confirm existing status and handle the indexing quota
 
-### 2A. Submit the sitemap
+### 2A. Confirm the account-side statuses once — do not redo completed setup
 
-1. Open **[Search Console for this website](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)** after ownership is verified.
-2. Confirm the top-left property is **`https://carterflayhart.pages.dev/`**.
-3. In the left sidebar, select **Sitemaps** (usually under **Indexing**). A direct link is **[this property's Sitemaps page](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**.
-4. Under **Add a new sitemap**:
-   - If the site prefix is already printed before the input, type **`sitemap.xml`** only.
-   - If the input asks for a complete URL, paste **`https://carterflayhart.pages.dev/sitemap.xml`**.
-5. Click **Submit**. Confirm it appears under submitted sitemaps. It may be Pending before Google reports Success.
-6. You can inspect the published **[sitemap XML](https://carterflayhart.pages.dev/sitemap.xml)** without signing in.
+The public prerequisites pass. To confirm the Google-account portion that the agent cannot inspect:
 
-### 2B. Request indexing of the home page
+1. Open **[Search Console for this property](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**, signed into the same Google account used for verification. Confirm the top-left property is **`https://carterflayhart.pages.dev/`**.
+2. Open **[Settings → Ownership verification](https://search.google.com/search-console/ownership?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)** and confirm it reports that you are a verified owner. If you already saw **Ownership verified**, do not click Verify again or download another file. The [existing verification URL](https://carterflayhart.pages.dev/google5f578c920a2f92ee.html) is still accessible and unchanged.
+3. Open **[Indexing → Sitemaps](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. Confirm **`https://carterflayhart.pages.dev/sitemap.xml`** appears under submitted sitemaps:
+   - **Success:** submission is confirmed; do not submit it again.
+   - **Pending / processing:** leave it in place and check later; do not duplicate it.
+   - **No entry:** submit `sitemap.xml` if the form already supplies the website prefix, or the complete URL if it asks for a full URL. Click **Submit** once.
+   - **Couldn't fetch / another error:** share the exact status/error with the agent. The [public sitemap](https://carterflayhart.pages.dev/sitemap.xml) has passed the live checks, but that does not prove Google has fetched it successfully. Do not remove/recreate the property to troubleshoot this.
+4. Tell the agent the **ownership status** and **sitemap status**, or supply a cropped screenshot containing those labels and the property URL. Do not send passwords, authorization codes or cookies. This is enough to close out the account-side confirmation; no repeat of the live-URL test is required.
 
-1. In Search Console's top **Inspect any URL** field, paste **`https://carterflayhart.pages.dev/`** and press Enter.
-2. Wait for the inspection result. A new site's **URL is not on Google** result is not itself an installation failure.
-3. Select **Test live URL** if offered, then **Request indexing** when available. If the URL is already indexed, no repeated request is needed.
-4. Google may take days or longer to crawl/index the site. Do not repeatedly submit the same request; first-place search ranking is not guaranteed.
-5. If not already done, link the website from your **[GitHub profile](https://github.com/01cflayhart)** and academic profiles. Profile edits require your choice/permission; the agent has not changed them.
+### 2B. Indexing-request quota — wait, do not rebuild anything
 
-**Done when:** the sitemap is submitted and the home-page indexing request is accepted, or the page is already indexed. Search results/data can remain empty initially.
+Your successful **Test live URL** checks current accessibility; it does not mean the page is already indexed. The subsequent daily-quota message means the manual request was not accepted at that time.
+
+1. **Stop retrying for now.** Google's [official recrawl guidance](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl) states that individual indexing requests have a quota and repeated requests do not speed crawling. There is no guaranteed reset time or indexing deadline in these instructions.
+2. Keep the valid sitemap and public profile link in place. **An accepted manual request is not required for normal discovery/crawling.** You can proceed to Bing now; waiting for this quota is not a launch blocker.
+3. On a later day, open **[Search Console](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. In the top **Inspect any URL** field, paste **`https://carterflayhart.pages.dev/`** and press Enter.
+4. If it says **URL is on Google**, no indexing request is needed. Otherwise, select **Request indexing** once if available. There is no need to repeat a successful live test unless Google reports a new accessibility issue.
+5. If the quota is still exceeded, leave the sitemap submitted and allow normal discovery; check the indexing report later. Do not create alternate properties/accounts or new API tokens to try to bypass the quota. Do not repeatedly press the button.
+
+**Done for launch:** ownership is verified and the sitemap is submitted. A future accepted request or confirmed indexing can be recorded later; waiting for Google is not another setup task you must solve. Crawling/indexing can take days or weeks, inclusion is not guaranteed, and a first-place search result cannot be promised.
 
 ## 3. Add the site to Bing — web browser
 
-1. Open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)** and sign in with your chosen account.
-2. If offered, choose **Import from Google Search Console**. Complete the Google account authorization yourself, select **`https://carterflayhart.pages.dev/`**, and finish the import. This is easiest after Step 1 succeeds.
-3. If import is unavailable or you prefer not to authorize it, choose **Add site** / manual addition and enter **`https://carterflayhart.pages.dev/`**.
-4. For manual verification, choose Bing's **XML file** method and download **`BingSiteAuth.xml`** (or the exact filename Bing gives you). Leave it unchanged in Downloads and tell the agent where it is; the agent can copy, commit, publish and check it, just as for the Google file. **Do not press Verify until the file is publicly accessible.** Then return to Bing and click **Verify**. Do not add DNS records for a domain you do not own.
-5. Select the verified site in Bing. Open **Sitemaps** in its sidebar, click **Submit sitemap**, and enter **`https://carterflayhart.pages.dev/sitemap.xml`**. If import already added the sitemap successfully, do not duplicate it.
-6. If Bing offers **URL submission** or an indexing request, submit **`https://carterflayhart.pages.dev/`** once.
+You have not started this section yet. It is independent of Google's indexing-request quota.
 
-**Done when:** Bing recognizes you as a verified owner and lists the sitemap. Bing sign-in, Google import consent and account-side verification require you; the agent can handle any downloaded public verification file.
+1. Open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)** and sign in with your chosen account.
+2. If offered, choose **Import from Google Search Console**. Complete Google's authorization yourself, select **`https://carterflayhart.pages.dev/`**, and finish the import. Google ownership must be verified; an accepted Google indexing request is **not** required.
+3. If import is unavailable or you prefer not to authorize it, choose **Add site** / manual addition and enter **`https://carterflayhart.pages.dev/`**.
+4. For manual verification, choose Bing's **XML file** method and download **`BingSiteAuth.xml`** (or the exact filename Bing gives you). Leave it unchanged in Downloads and tell the agent where it is. The agent can copy, commit, publish and check it. **Do not press Verify until the agent confirms the file is publicly accessible.** Then return to Bing and click **Verify**. Do not add DNS records for `pages.dev` or any domain you do not own.
+5. Select the verified site in Bing. Open **Sitemaps** in its sidebar, click **Submit sitemap**, and enter **`https://carterflayhart.pages.dev/sitemap.xml`**. If import already added it successfully, do not duplicate it.
+6. If Bing offers **URL submission** or an indexing request, submit **`https://carterflayhart.pages.dev/`** once. Bing indexing can also take time.
+
+**Done when:** Bing recognizes you as a verified owner and lists the sitemap. Account sign-in, Google-import consent and clicking Verify require you; the agent can handle any supplied public verification file and website-side troubleshooting.
 
 ## 4. Optional: connect sportsbook prices, not validated predictions
 
