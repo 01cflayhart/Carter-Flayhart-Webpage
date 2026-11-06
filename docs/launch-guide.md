@@ -1,130 +1,87 @@
-# Remaining website launch steps
+# Remaining launch steps: finish search verification
 
-**Next optional setup: Step 1, feedback email. No OAuth setup needs to be repeated.**
+**Your next manual action is clicking Verify in Google Search Console. No file moving, terminal commands or Git push is needed from you.**
 
-The [website](https://carterflayhart.pages.dev) and [GitHub Actions deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42304387785) are working. Cloudflare contains all three login settings. The live sign-in endpoint redirects to GitHub with the exact production callback, state protection and a secure HTTP-only cookie. Anonymous owner APIs still return 401.
+The agent copied `google5f578c920a2f92ee.html` byte-for-byte from Downloads into `site/`, leaving the original intact, and is handling publication. Your verification URL is:
 
-This verifies the login **configuration and redirect**, not the final GitHub code exchange or your signed-in dashboard: those require your browser authorization. If you already signed in and saw the dashboard, do not repeat the setup; finish only the checks in Step 2 that you have not done.
+**<https://carterflayhart.pages.dev/google5f578c920a2f92ee.html>**
 
-**Do not recreate API tokens, OAuth applications, hosting or databases, regenerate the session secret, or repeat the earlier configuration/push steps.** Keep existing GitHub Pages hosting in place. Never send credentials or session cookies in chat.
+Login/email settings and the actual deployment have been checked. The live sign-in redirect is correct, anonymous owner APIs return 401, and one real feedback test was accepted by the website and Resend. **That proves provider acceptance, not inbox arrival.** Your reported owner-dashboard, exclusion/sign-out and inbox checks cannot be independently inspected from the agent's separate browser/session. If you completed them as reported, do not repeat them. If not, confirm using the [owner dashboard](https://carterflayhart.pages.dev/private), [Gmail](https://mail.google.com/mail/u/0/#inbox) for **carter.flayhart@gmail.com**, and [Resend email logs](https://resend.com/emails). The new test message begins `Launch verification by Carter website assistant`.
+
+**Do not recreate tokens, OAuth apps, databases or email keys. Do not change the session secret or delete the original GitHub Pages hosting.** The Resend sender remains a sandbox/test sender restricted to your own account email; provider acceptance is not production-sender approval. Keep the [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) if the provider does not permit the intended ongoing use. No purchase is required by this guide.
 
 Remaining work:
 
-- [ ] 1. Optionally create the Resend account/key and verify feedback delivery.
-- [ ] 2. Confirm your actual owner sign-in, activity exclusion and sign-out behavior.
-- [ ] 3. Verify Google/Bing ownership and submit the sitemap.
-- [ ] 4. Optionally connect available sportsbook prices. Validated prediction models remain separate engineering work.
+- [ ] 1. Click Verify in Google Search Console.
+- [ ] 2. Submit the sitemap and request Google indexing.
+- [ ] 3. Add/import the site into Bing and submit the sitemap.
+- [ ] 4. Optionally connect sportsbook prices. Prediction models remain separate work.
 
-## 1. Optional: enable feedback-form email delivery
+## 1. Finish Google ownership verification — web browser
 
-You can skip this: the [direct email link](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) already works without an email provider. No paid plan or purchased domain is required to keep that fallback.
+1. Return to the **Google Search Console tab that gave you the downloaded HTML file**. Stay signed into the same Google account that downloaded it.
+2. If you closed that tab, open **[Search Console for this website](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. In the top-left property selector, choose **`https://carterflayhart.pages.dev/`**. Do not choose the old GitHub Pages site or a Domain property for `pages.dev`.
+3. If the verification panel is not already open, choose the unverified property or open **[Ownership verification](https://search.google.com/search-console/ownership?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. Select the **HTML file** method. Do not download or generate a replacement file unless Google explicitly gives you a different filename for this account/property.
+4. The file to verify is **[google5f578c920a2f92ee.html](https://carterflayhart.pages.dev/google5f578c920a2f92ee.html)**. It should show exactly:
 
-The agent has prepared `FEEDBACK_FROM` in Cloudflare as `Carter Website <onboarding@resend.dev>`. **This is a sandbox/test sender, not a verified-domain production sender.** `RESEND_API_KEY` is still missing, so form delivery is not enabled. No test message has been sent on your behalf.
+   ```text
+   google-site-verification: google5f578c920a2f92ee.html
+   ```
 
-### 1A. Create your Resend account — web browser
+   If publication is still finishing and the URL returns 404, wait for the newest **[Cloudflare deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml)** to complete, then refresh. The agent is handling this deployment; do not copy the file again or change its contents.
+5. In Google's verification panel, click **Verify**.
+6. Wait for **Ownership verified**, then click **Go to property** if offered.
 
-1. Open **[Create a Resend account](https://resend.com/signup)**. If you already have an account, use **[Resend sign-in](https://resend.com/login)**.
-2. Register with **carter.flayhart@gmail.com**, the website's fixed feedback recipient. If using Google sign-in, explicitly select that Google account rather than your RIT account. If Resend sends an email verification link/code, complete it yourself.
-3. Use the **Free transactional-email plan**. Do not enable paid upgrades, overages, marketing tools or a domain purchase for these instructions. [Current pricing and limits](https://resend.com/pricing) list 3,000 emails/month and 100/day on Free; provider limits can change.
-4. If onboarding asks for a domain, do not enter `pages.dev`, `rit.edu` or any other domain you do not control. Open the API-key link in Step 1B to see whether you can proceed with a sandbox test. If domain verification is mandatory for your account, stop and keep the direct email fallback rather than purchasing anything.
+**Done when:** Google confirms ownership. Publishing the file alone does not complete that account-side step. Keep `site/google5f578c920a2f92ee.html` permanently in the repository; Google rechecks it. Do not delete it after verification.
 
-**Sandbox restriction:** [Resend's documentation](https://resend.com/docs/knowledge-base/403-error-resend-dev-domain) says `onboarding@resend.dev` can send test emails only to the email address associated with your Resend account. That is why the account address must match **carter.flayhart@gmail.com**. This does not establish approval or reliability for an ongoing public production form. A production sender requires following Resend's domain/policy requirements; if that requires a domain you do not already own, keep the free email-link fallback unless you explicitly choose otherwise.
+If Google rejects verification, share the error text and the filename Google expects, not account passwords or cookies. Confirm the Google account and exact URL-prefix property before changing anything. [Official verification help](https://support.google.com/webmasters/answer/9008080).
 
-### 1B. Create a sending-only API key — web browser
+## 2. Submit the sitemap and request indexing — web browser
 
-1. Open **[Resend → API keys](https://resend.com/api-keys)** while signed in.
-2. Click **Create API Key**.
-3. Name it `Carter website feedback`.
-4. For **Permission**, choose **Sending access**, not Full access. [Official key-creation instructions](https://resend.com/docs/create-an-api-key) describe these controls.
-5. Domain restriction is optional. For the sandbox test, leave that optional restriction unset; do not select a domain you do not own. If the controls differ or require a verified domain, stop rather than granting unrelated permissions or buying a domain.
-6. Create the key and copy its newly displayed value. Resend normally shows it only once. Do not paste it into chat, a source file or a GitHub issue.
+### 2A. Submit the sitemap
 
-### 1C. Store the key — Ubuntu/WSL terminal
+1. Open **[Search Console for this website](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)** after ownership is verified.
+2. Confirm the top-left property is **`https://carterflayhart.pages.dev/`**.
+3. In the left sidebar, select **Sitemaps** (usually under **Indexing**). A direct link is **[this property's Sitemaps page](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**.
+4. Under **Add a new sitemap**:
+   - If the site prefix is already printed before the input, type **`sitemap.xml`** only.
+   - If the input asks for a complete URL, paste **`https://carterflayhart.pages.dev/sitemap.xml`**.
+5. Click **Submit**. Confirm it appears under submitted sitemaps. It may be Pending before Google reports Success.
+6. You can inspect the published **[sitemap XML](https://carterflayhart.pages.dev/sitemap.xml)** without signing in.
 
-Open the **Ubuntu/WSL terminal**, not the browser's address bar. First enter:
+### 2B. Request indexing of the home page
 
-```bash
-cd /mnt/c/Users/Carte/Website
-```
+1. In Search Console's top **Inspect any URL** field, paste **`https://carterflayhart.pages.dev/`** and press Enter.
+2. Wait for the inspection result. A new site's **URL is not on Google** result is not itself an installation failure.
+3. Select **Test live URL** if offered, then **Request indexing** when available. If the URL is already indexed, no repeated request is needed.
+4. Google may take days or longer to crawl/index the site. Do not repeatedly submit the same request; first-place search ranking is not guaranteed.
+5. If not already done, link the website from your **[GitHub profile](https://github.com/01cflayhart)** and academic profiles. Profile edits require your choice/permission; the agent has not changed them.
 
-Then run this command by itself:
+**Done when:** the sitemap is submitted and the home-page indexing request is accepted, or the page is already indexed. Search results/data can remain empty initially.
 
-```bash
-npx --yes wrangler@4.158.0 pages secret put RESEND_API_KEY --project-name carterflayhart
-```
+## 3. Add the site to Bing — web browser
 
-At the secret-value prompt, paste **only the Resend API key**, then press Enter. Do not add quotes, `Bearer ` or the field name. Wait for the success confirmation. The prompt may hide what you type.
+1. Open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)** and sign in with your chosen account.
+2. If offered, choose **Import from Google Search Console**. Complete the Google account authorization yourself, select **`https://carterflayhart.pages.dev/`**, and finish the import. This is easiest after Step 1 succeeds.
+3. If import is unavailable or you prefer not to authorize it, choose **Add site** / manual addition and enter **`https://carterflayhart.pages.dev/`**.
+4. For manual verification, choose Bing's **XML file** method and download **`BingSiteAuth.xml`** (or the exact filename Bing gives you). Leave it unchanged in Downloads and tell the agent where it is; the agent can copy, commit, publish and check it, just as for the Google file. **Do not press Verify until the file is publicly accessible.** Then return to Bing and click **Verify**. Do not add DNS records for a domain you do not own.
+5. Select the verified site in Bing. Open **Sitemaps** in its sidebar, click **Submit sitemap**, and enter **`https://carterflayhart.pages.dev/sitemap.xml`**. If import already added the sitemap successfully, do not duplicate it.
+6. If Bing offers **URL submission** or an indexing request, submit **`https://carterflayhart.pages.dev/`** once.
 
-This is a **Cloudflare Pages runtime secret**, not a GitHub repository secret. The sender is already prepared; you do not need another `FEEDBACK_FROM` command for this sandbox test. Do not modify the three GitHub-login/session settings.
-
-### 1D. Redeploy — web browser
-
-1. Open **[Publish to Cloudflare Pages](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml)**.
-2. Click **Run workflow** → select **Branch: main** → click **Run workflow** in the menu.
-3. Open the newest run and wait for **Deploy static assets and protected Pages Functions** to succeed. A skipped deployment is not enough. Changing a runtime secret alone is not a substitute for this redeployment.
-
-No new Git push is needed to save a runtime secret. Alternatively, after saving it, ask the agent to redeploy and check the logs for you; do not send the key.
-
-### 1E. Verify the actual test email — web browser
-
-1. Open **[Sports hub → Help improve the hub](https://carterflayhart.pages.dev/sports/#feedback-title)**.
-2. Enter a recognizable message of at least 10 characters, such as `Website feedback delivery test`, and click **Send feedback**. Your email field is optional; it is not the delivery destination.
-3. Open **[Gmail inbox](https://mail.google.com/mail/u/0/#inbox)** and confirm you are viewing **carter.flayhart@gmail.com**, not another signed-in account. Check spam too.
-4. Open **[Resend → Emails/logs](https://resend.com/emails)** to inspect the message status if needed. A provider's accepted/delivered status does not replace your inbox check.
-
-**Done when:** the sandbox test actually arrives. A configured API key, setup-check badge or successful form response is not proof of inbox arrival or production-sender approval.
-
-If you see a Resend 403 about testing recipients, check that the Resend account email matches the fixed recipient and review the linked sandbox documentation. Do not change the destination to an arbitrary visitor address or invent a sender. If the service does not permit the intended use, keep the direct email fallback. Do not send the agent a key-bearing screenshot; share only the safe error message.
-
-## 2. Confirm your actual owner sign-in and preferences
-
-The configuration/deployment is verified. The agent cannot inspect your private browser session or prove the Client Secret's code exchange from secret names alone. Complete only the following checks you have not already done:
-
-1. Open **[Owner dashboard](https://carterflayhart.pages.dev/private)**. If signed out, select GitHub sign-in and complete authorization as **01cflayhart** yourself.
-2. Confirm the dashboard appears and **Setup checks** reports owner sign-in and database configured. An email warning is expected if you skipped Step 1. Tell the agent whether these checks succeeded; do not share your session cookie.
-3. Confirm separate daily **professional** and **sports** counts appear. Leave **Exclude my activity** checked, visit the [home page](https://carterflayhart.pages.dev/) and [sports hub](https://carterflayhart.pages.dev/sports/), and confirm your visits are excluded. Uncheck it and test inclusion if desired. DNT/Global Privacy Control may still suppress tracking; counts are page views, not unique people.
-4. Sign out. Private data must become inaccessible, while this browser's activity-exclusion preference remains in effect.
-5. In an incognito/signed-out window, **[owner statistics API](https://carterflayhart.pages.dev/api/owner/stats)** and **[owner setup API](https://carterflayhart.pages.dev/api/owner/setup)** must return **401** without private data. The agent has verified these anonymous checks; repeat them after testing your authenticated session if needed.
-
-If the actual GitHub sign-in fails, open **[GitHub OAuth app settings](https://github.com/settings/developers)** → **OAuth Apps** → your existing app. Its callback/Redirect URI must be exactly `https://carterflayhart.pages.dev/api/auth/callback`. Use the production hostname, not a preview subdomain. Share only the error text or failed run URL; do not create a replacement app or send credentials without first diagnosing the problem.
-
-Keep the old GitHub Pages hosting until the transition is fully verified. This guide does not instruct deleting or redirecting it.
-
-## 3. Verify search ownership and submit the sitemap
-
-The public canonical URL and sitemap prerequisites have passed automated checks. Signing into Google/Bing and verifying site ownership require you.
-
-### 3A. Google Search Console
-
-1. Open **[Google Search Console](https://search.google.com/search-console)** and sign into your Google account.
-2. Choose **Add property → URL prefix**. Do not choose a DNS/Domain property for `pages.dev`.
-3. Enter `https://carterflayhart.pages.dev/`.
-4. Choose **HTML file** verification and download Google's verification file. [Google's ownership-verification help](https://support.google.com/webmasters/answer/9008080) explains the method if the controls differ.
-5. Put the file **unchanged** in `/mnt/c/Users/Carte/Website/site/`. Do not put it in generated `_site/`. You can supply this non-secret verification file to the agent and ask it to add/commit/push it for you.
-6. Wait for a successful [Cloudflare deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml). Open the website followed by the exact downloaded filename and confirm it is accessible.
-7. Return to Search Console and click **Verify**. Keep the verification file in the repository afterward.
-8. In **Sitemaps**, submit **[the website sitemap](https://carterflayhart.pages.dev/sitemap.xml)**: `https://carterflayhart.pages.dev/sitemap.xml`.
-9. Use **URL inspection** for `https://carterflayhart.pages.dev/` and request indexing if offered. Link the website from your [GitHub profile](https://github.com/01cflayhart) and academic profiles.
-
-### 3B. Bing Webmaster Tools
-
-1. Open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)** and sign in.
-2. Import the verified Search Console site if offered, or add `https://carterflayhart.pages.dev/` using Bing's HTML-file verification method.
-3. If downloading a file, follow the same `site/` → commit/push → successful deployment → verification sequence. The agent can handle the repository/deployment work after you provide the non-secret file.
-4. Submit **[the same sitemap](https://carterflayhart.pages.dev/sitemap.xml)**.
-
-**Done when:** ownership is verified and the sitemap is submitted. Indexing takes time; a first-place search result is not guaranteed.
+**Done when:** Bing recognizes you as a verified owner and lists the sitemap. Bing sign-in, Google import consent and account-side verification require you; the agent can handle any downloaded public verification file.
 
 ## 4. Optional: connect sportsbook prices, not validated predictions
 
-1. Open **[The Odds API](https://the-odds-api.com/)** and use its **Get API Key** signup for the free plan. Do not choose a paid subscription unless you explicitly want one. [API documentation](https://the-odds-api.com/liveapi/guides/v4/) explains the key and quota.
-2. Open **[New GitHub repository secret](https://github.com/01cflayhart/Carter-Flayhart-Webpage/settings/secrets/actions/new)**:
+Skip this if you only want to finish the academic website/search launch.
+
+1. Open **[The Odds API](https://the-odds-api.com/)** and use **Get API Key** to sign up for its free plan. Do not choose a paid plan unless you explicitly want one. [Provider documentation](https://the-odds-api.com/liveapi/guides/v4/) explains the key and quota.
+2. Open **[New GitHub repository secret](https://github.com/01cflayhart/Carter-Flayhart-Webpage/settings/secrets/actions/new)** and save:
    - **Name:** `ODDS_API_KEY`
-   - **Secret:** the odds-provider API key.
-3. Open **[Review and archive sports analysis daily](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/sports-analysis.yml)**.
-4. Click **Run workflow → main → Run workflow**.
-5. Confirm it and its subsequent [Cloudflare deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml) succeed. Inspect the [sports hub](https://carterflayhart.pages.dev/sports/) for current coverage or a clear missing-data notice.
+   - **Secret:** your odds-provider API key. Do not send its value in chat.
+3. Open **[Review and archive sports analysis daily](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/sports-analysis.yml)** → **Run workflow → main → Run workflow**.
+4. Confirm it and the following **[Cloudflare deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml)** succeed. The agent can trigger/check these after you save the key.
+5. Inspect the **[sports hub](https://carterflayhart.pages.dev/sports/)** for current market coverage or a clear missing-data notice.
 
 Available DraftKings/FanDuel moneylines appear under **Market coverage · not forecasts**. Six credits per run are budgeted; manual runs also consume quota. Coverage is partial. Fanatics/Caesars are not on the documented free tier; do not enable paid sources automatically. No bets are placed.
 
-**An odds key does not complete the prediction models.** Prop Hunt picks and Upset Alert probability categories still require validated independent model/evidence and settlement feeds. This is additional data/model engineering, not another account checkbox for you. Leave `SPORTS_INPUT_URL` and related optional feed secrets unset until a verified source exists. Do not substitute implied odds for independent probabilities or invent picks. Technical requirements remain in [sports-operations.md](sports-operations.md).
+**An odds key does not complete the prediction models.** Prop Hunt picks and Upset Alert probability categories still require validated independent model/evidence and settlement feeds. This is additional engineering, not another account checkbox for you. Leave `SPORTS_INPUT_URL` and related optional feed secrets unset until a verified source exists. Do not substitute implied odds for independent probabilities or invent picks. Technical requirements remain in [sports-operations.md](sports-operations.md).
