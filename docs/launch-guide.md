@@ -1,10 +1,10 @@
 # Launch Carter’s website
 
-The implementation is ready for account setup, not already deployed. These steps use free hosting and do not require buying a domain or odds subscription. Keep the existing GitHub Pages website until the Cloudflare site is verified. Never send credentials in chat, commit them, or place them in `site/`.
+The initial website is now live at <https://carterflayhart.pages.dev>. It was deployed using the existing local Cloudflare OAuth login. GitHub Actions deployment credentials still need their own successful workflow check; owner sign-in and email setup remain unfinished. These steps use free hosting and do not require buying a domain or odds subscription. Keep the existing GitHub Pages website. Never send credentials in chat, commit them, or place them in `site/`.
 
 Repository: <https://github.com/01cflayhart/Carter-Flayhart-Webpage>
 
-Desired website: <https://carterflayhart.pages.dev> (availability is confirmed only when you create the project).
+Live website: <https://carterflayhart.pages.dev> (project creation and production URL verified).
 
 Commands below use bash/WSL from the repository root, with Git, Node.js 22+ and Python 3 available. `npx` downloads the pinned Wrangler CLI when necessary; no global installation is required.
 
@@ -17,13 +17,15 @@ Commands below use bash/WSL from the repository root, with Git, Node.js 22+ and 
 - [ ] Your terminal's exported variable cannot be verified from this separate agent shell. This is no longer a blocker: the local configuration is generated, and GitHub Actions will use its own repository variable.
 - [ ] Section 2: reported complete by Carter. Independent verification is blocked because GitHub is not authenticated in this agent environment. Confirm the two secret names, the variable value, and workflow permissions using the checks below; no need to recreate them if correct. Secret values cannot be read back from GitHub.
 - [x] Production D1 migration `0001_analytics.sql` applied successfully using the existing Cloudflare login. The analytics and rate-limit tables are created; do not recreate the database.
-- [ ] Section 3: push the prepared local launch commits to GitHub and confirm the **GitHub Actions** Cloudflare deployment succeeds. Initial deployment via the existing local Cloudflare login is handled separately below; that does not verify the GitHub API token.
+- [x] Initial Cloudflare production deployment completed. Live GET checks passed for the home page, CV PDF, sports hub and both tennis datasets. Anonymous owner APIs return 401; private login remains unavailable until its secrets are configured. No feedback mail or synthetic analytics events were submitted during verification.
+- [x] Launch source committed locally on `main`, with the latest remote publication/ranking updates incorporated without discarding them. Generated assets, local configuration and credentials were excluded. A final documentation commit records the launch status.
+- [ ] Section 3: authenticate GitHub in WSL if needed, push the prepared local launch commits, and confirm the **GitHub Actions** Cloudflare deployment succeeds. The successful local deployment does **not** verify the saved GitHub API token, repository variable or workflow permissions.
 - [ ] Section 4: configure owner-login secrets. The Pages production secret list is currently empty.
 - [ ] Section 5: optional email sender configuration; no Pages production secrets are present yet.
 - [ ] Section 6: verify the live website, authorization, activity counts and actual feedback delivery.
 - [ ] Sections 7–8: optional odds account connection and search-engine verification/indexing.
 
-**Next manual step: confirm the Section 2 settings below, then follow Section 3's WSL terminal push instructions.** Do not recreate the existing project or database. The existing GitHub Pages site has not been removed. These are point-in-time checks, not claims that future steps are complete.
+**Next manual step: confirm the Section 2 settings below, then follow Section 3's WSL terminal authentication/push instructions.** After a successful GitHub Actions deployment, continue at Section 4 for owner login and Section 5 for optional email. Do not recreate the existing project or database. The existing GitHub Pages site has not been removed. These are point-in-time checks, not claims that future steps are complete.
 
 ### Why the configuration command failed, and how to run it correctly
 
@@ -100,7 +102,7 @@ These are **GitHub website** checks, not terminal commands. The agent cannot cur
 
 ## 3. Publish the source changes
 
-The launch work is being prepared as local commits by this session. GitHub authentication is still your manual step. Do not include `.env*`, `.dev.vars*`, `wrangler.jsonc`, caches, or generated `_site/`; these are ignored. The maintained `wrangler.jsonc.example` is safe to commit; it contains only a placeholder database ID.
+The launch work has already been committed locally by this session, including a documentation update recording the initial live deployment. GitHub authentication and push are still your manual steps. Do not include `.env*`, `.dev.vars*`, `wrangler.jsonc`, caches, or generated `_site/`; these are ignored. The maintained `wrangler.jsonc.example` is safe to commit; it contains only a placeholder database ID.
 
 **Where to type the push:** use your **Ubuntu/WSL terminal**, the same kind of terminal where you ran `npx` and `export`. Do not type Git commands in Cloudflare's website, GitHub's website, a browser address bar or the Node.js interactive prompt. The terminal can initially be in `/home/carter`; the first command below moves it to the correct website folder.
 
@@ -123,10 +125,10 @@ Cloudflare login does **not** sign Git into GitHub. Do not enter your ordinary G
 ```bash
 sudo apt update
 sudo apt install gh
-gh auth login
+gh auth login --scopes workflow
 ```
 
-Installing `gh` is a local system package step; if already installed, skip the installation. In `gh auth login`, choose **GitHub.com → HTTPS → Log in with a web browser**, then follow its one-time code/link instructions using your 01cflayhart account. Complete authorization yourself. Then run:
+Installing `gh` is a local system package step; if already installed, skip the installation. In `gh auth login`, choose **GitHub.com → HTTPS → Log in with a web browser**, then follow its one-time code/link instructions using your 01cflayhart account. The `workflow` scope permits pushing the new GitHub Actions workflow files. Complete authorization yourself. Then run:
 
 ```bash
 gh auth setup-git
@@ -135,6 +137,8 @@ git push origin main
 ```
 
 If installing software is not allowed on your machine, use your editor's authenticated Source Control push for this same folder instead. No need to paste a personal access token into chat.
+
+If GitHub rejects a workflow-file push because the OAuth token lacks `workflow` scope, run `gh auth refresh -h github.com -s workflow`, finish browser authorization, and retry the push.
 
 If the push is rejected because `main` has newer remote commits, run `git status` first. With a clean working tree, run `git pull --rebase origin main`, then `git push origin main`. If conflicts are reported, stop and ask for help; do not force-push, reset or discard files.
 
