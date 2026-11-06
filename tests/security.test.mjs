@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { onRequest as googleVerification } from '../functions/google5f578c920a2f92ee.html.js';
 import { sign, verify, owner, body } from '../functions/_lib/security.js';
 import { onRequest as api } from '../functions/api/[[path]].js';
 import { onRequest as privatePage } from '../functions/private.js';
@@ -9,6 +11,18 @@ import cloudflareAccess from '../scripts/check-cloudflare-access.cjs';
 
 const env = { SESSION_SECRET: 'test-only-long-secret-never-use-in-production', GITHUB_OWNER_ID: '168453384' };
 const request = (path, options={}) => new Request('https://carterflayhart.pages.dev'+path, options);
+test('Google verification serves the unchanged public file at its exact HTML path', async () => {
+  const path = '/google5f578c920a2f92ee.html';
+  const source = readFileSync(new URL('../site'+path, import.meta.url), 'utf8');
+  const routes = JSON.parse(readFileSync(new URL('../site/_routes.json', import.meta.url), 'utf8'));
+  assert.ok(routes.include.includes(path));
+  const response = googleVerification({request:request(path)});
+  assert.equal(response.status,200);
+  assert.equal(response.headers.has('Location'),false);
+  assert.equal(await response.text(),source);
+  assert.equal(await googleVerification({request:request(path,{method:'HEAD'})}).text(),'');
+  assert.equal(googleVerification({request:request(path,{method:'POST'})}).status,405);
+});
 test('sessions require valid HMAC, future expiry, purpose and exact owner ID', async () => {
  const good = await sign({ id: 168453384, purpose:'owner', exp:Date.now()/1000+300 },env.SESSION_SECRET);
  const req = request('/private',{headers:{Cookie:'__Host-carter_session='+good}});
