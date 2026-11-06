@@ -1,5 +1,105 @@
 const {test,expect}=require('@playwright/test');
 const AxeBuilder=require('@axe-core/playwright').default;
+test('sports tools have honest empty states, book selection and accessible controls',async({page},info)=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ for(const tool of ['prop-hunt','upset-alert']){
+  await page.goto('/sports/'+tool+'/');
+  await expect(page.locator('#data-state')).toContainText('No picks have been invented');
+  await expect(page.locator('.model-warning')).toContainText('High inaccuracy');
+  await expect(page.locator('#performance-board')).toContainText('0–0');
+  await page.locator('#sportsbook').selectOption('caesars');
+  await expect(page.locator(tool==='prop-hunt'?'#top-board':'#favorites-board')).toContainText('free tier does not include');
+  await page.locator('#stats-window').selectOption('7');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+  const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+  await page.screenshot({path:'/tmp/opencode/'+tool+'-'+info.project.name+'.png',fullPage:true});
+ }
+ expect(errors).toEqual([]);
+});
+test('feedback preserves a message when email service is unavailable',async({page})=>{
+ await page.goto('/sports/');
+ await page.locator('#hub-feedback textarea').fill('Synthetic feedback test; do not send.');
+ await page.route('**/api/feedback',route=>route.fulfill({status:503,body:'{"error":"Not configured"}'}));
+ await page.getByRole('button',{name:'Send feedback'}).click();
+ await expect(page.locator('#feedback-status')).toContainText('could not be sent');
+ await expect(page.locator('#hub-feedback textarea')).toHaveValue('Synthetic feedback test; do not send.');
+});
+test('feedback requires a confirmed JSON delivery response, not a static fallback page',async({page})=>{
+ await page.goto('/sports/');
+ await page.locator('#hub-feedback textarea').fill('Synthetic message; intercepted, never delivered.');
+ await page.route('**/api/feedback',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Static fallback</title>'}));
+ await page.getByRole('button',{name:'Send feedback'}).click();
+ await expect(page.locator('#feedback-status')).toContainText('could not be sent');
+ await expect(page.locator('#hub-feedback textarea')).not.toHaveValue('');
+ await page.unroute('**/api/feedback');
+ await page.route('**/api/feedback',route=>route.fulfill({json:{ok:true}}));
+ await page.getByRole('button',{name:'Send feedback'}).click();
+ await expect(page.locator('#feedback-status')).toContainText('Feedback sent');
+ await expect(page.locator('#hub-feedback textarea')).toHaveValue('');
+});
+test('private setup checks display missing configuration and recover from network errors',async({page})=>{
+ const {onRequest}=await import('../../functions/private.js');
+ const {sign}=await import('../../functions/_lib/security.js');
+ const env={SESSION_SECRET:'test-only-long-secret-never-use-in-production',GITHUB_OWNER_ID:'168453384'};
+ const session=await sign({id:168453384,purpose:'owner',exp:Date.now()/1000+300},env.SESSION_SECRET);
+ const response=await onRequest({request:new Request('https://carterflayhart.pages.dev/private',{headers:{Cookie:'__Host-carter_session='+session}}),env});
+ const html=await response.text();
+ await page.route('**/private',route=>route.fulfill({contentType:'text/html',body:html}));
+ await page.route('**/api/owner/stats',route=>route.fulfill({json:{owner_excluded:true,rows:[]}}));
+ await page.route('**/api/owner/setup',route=>route.fulfill({json:{checks:[{id:'database',title:'Activity database',configured:false,message:'Bind DB and apply migrations.'},{id:'email',title:'Feedback email',configured:true,message:'Send feedback and verify actual arrival.'}]}}));
+ await page.goto('/private');
+ await expect(page.locator('#setup-checks')).toContainText('Activity database · Needs setup');
+ await expect(page.locator('#setup-checks')).toContainText('Feedback email · Configured');
+ await expect(page.locator('#status')).toContainText('No activity');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
+ await page.unroute('**/api/owner/setup');await page.route('**/api/owner/setup',route=>route.abort());
+ await page.getByRole('button',{name:'Check again'}).click();
+ await expect(page.locator('#setup-status')).toContainText('Setup checks unavailable');
+ await expect(page.getByRole('button',{name:'Check again'})).toBeEnabled();
+ await page.route('**/api/auth/logout',route=>route.abort());
+ await page.getByRole('button',{name:'Sign out',exact:true}).click();
+ await expect(page.locator('#status')).toContainText('Sign-out failed');
+ await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeEnabled();
+});
+test('synthetic forecast fixtures display estimates, settlement and book isolation safely',async({page})=>{
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const stats={'All picks':{wins:1,losses:0,win_rate:1,n:1,pending:0,pushes:0,voids:0,brier:.01}};
+ const forecast={prediction_id:'test',date:today,label:'Synthetic fixture <img src=x onerror=alert(1)>',list:'top',rank:1,probability:.9,season_hit_rate:1,odds:110,evidence:'Synthetic test only',outcome:'win',model_version:'test'};
+ const books={};for(const book of ['draftkings','fanduel','fanatics','caesars'])books[book]={current:{predictions:book==='draftkings'?[forecast]:[]},history:book==='draftkings'?[forecast]:[],performance:{all:stats,7:stats,30:stats}};
+ await page.route('**/analysis/prop-hunt.json',route=>route.fulfill({json:{date:today,checked_at:new Date().toISOString(),status:'Synthetic fixture only',books,review:'Synthetic test review'}}));
+ await page.goto('/sports/prop-hunt/');
+ await expect(page.locator('#top-board')).toContainText('90.0%');
+ await expect(page.locator('#top-board')).toContainText('+110');
+ await expect(page.locator('#top-board img')).toHaveCount(0);
+ await page.locator('#sportsbook').selectOption('fanduel');
+ await expect(page.locator('#top-board')).toContainText('No verified selections');
+});
+test('header and tabs meet without a scroll-through seam',async({page},info)=>{
+ test.skip(info.project.name==='mobile');
+ await page.goto('/#publications');
+ await page.evaluate(()=>window.scrollTo(0,650));
+ await page.waitForTimeout(100);
+ const gap=await page.evaluate(()=>document.querySelector('.section-nav').getBoundingClientRect().top-document.querySelector('.profile-header').getBoundingClientRect().bottom);
+ expect(gap).toBeLessThanOrEqual(0);
+ expect(gap).toBeGreaterThan(-3);
+});
+test('market coverage is separate from forecasts and never crosses books',async({page})=>{
+ const now=new Date(),today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
+ const books={};
+ for(const book of ['draftkings','fanduel','fanatics','caesars'])books[book]={current:{predictions:[]},history:[],performance:{all:{}},market_watchlist:book==='draftkings'?[{favorite:'Synthetic home fixture',label:'Synthetic away at home',sport:'NFL',odds:-250,as_of:now.toISOString(),starts_at:new Date(now.getTime()+3600000).toISOString(),status:'Market observation only; no independent win estimate'}]:[]};
+ await page.route('**/analysis/upset-alert.json',route=>route.fulfill({json:{date:today,checked_at:now.toISOString(),status:'Synthetic fixture only',review:'Synthetic review',books}}));
+ await page.goto('/sports/upset-alert/');
+ await expect(page.locator('#market-board')).toContainText('Synthetic home fixture');
+ await expect(page.locator('#market-board')).toContainText('no independent win estimate');
+ await expect(page.locator('#favorites-board')).not.toContainText('Synthetic home fixture');
+ await expect(page.locator('#review-note')).not.toContainText('Overall Prop Hunt');
+ await page.locator('#sportsbook').selectOption('fanduel');
+ await expect(page.locator('#market-board')).toContainText('No fresh market observations');
+ await page.locator('#sportsbook').selectOption('draftkings');
+ await page.locator('#slate-date').fill('2026-01-01');await page.locator('#slate-date').dispatchEvent('change');
+ await expect(page.locator('#market-board')).not.toContainText('Synthetic home fixture');
+});
 test('personal website and sports navigation are accessible',async({page},info)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
  await expect(page.getByRole('heading',{level:1})).toContainText('Carter');
@@ -14,7 +114,7 @@ test('personal website and sports navigation are accessible',async({page},info)=
 test('academic profile sections, history, and deep links work',async({page})=>{
  await page.goto('/');
  const nav=page.getByRole('navigation',{name:'Main navigation'});
-  await expect(nav.getByRole('link')).toHaveText(['About Me','Research','Publications','Talks & Conferences','Sports Analysis','Hobbies','CV','Contact']);
+  await expect(nav.getByRole('link')).toHaveText(['About Me','Research','Publications','Talks & Conferences','Hobbies','Sports Analysis Hub','CV (PDF ↗)','Contact']);
   expect(await page.locator('.portrait').evaluate(img=>img.complete&&img.naturalWidth>0)).toBeTruthy();
  await expect(page.locator('.profile-details')).toHaveText('Graduate Student • Rochester Institute of Technology');
  await expect(page.locator('.profile-intro')).toHaveText('I am an astrophysics graduate student working on high redshift galaxy evolution, focusing on quiescent galaxies, utilizing the COSMOS-Web dataset.');
@@ -87,8 +187,8 @@ test('CV, Contact, hobbies and newest-first talks use supplied information',asyn
  await nav.getByRole('link',{name:'Contact',exact:true}).click();
  await expect(page.locator('#contact a[href="mailto:cbf2388@rit.edu"]')).toBeVisible();await expect(page.locator('#contact a[href="mailto:carter.flayhart@gmail.com"]')).toBeVisible();
  await nav.getByRole('link',{name:'Hobbies',exact:true}).click();
- await expect(page.locator('#hobbies h3')).toHaveText(['Climbing','Hiking / Walking','Travel','Watching Sports']);
- await expect(page.locator('#hobbies')).toContainText('F1, and MMA');
+ await expect(page.locator('#hobbies h3')).toHaveText(['Hiking / Walking','Climbing','Travel','Watching Sports']);
+ await expect(page.locator('#hobbies')).toContainText('F1 and MMA');
  const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(audit.violations).toEqual([]);
 });
 test('published rankings are dated, searchable, and tour-isolated',async({page})=>{

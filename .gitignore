@@ -18,3 +18,17 @@ _site/
 data/health.json
 data/photos.json
 reports/
+data/sports/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+wrangler.jsonc
+.wrangler/
+# Publish only the two explicitly maintained agent definitions.
+!.opencode/
+.opencode/*
+!.opencode/agents/
+.opencode/agents/*
+!.opencode/agents/prop-hunt-updater.md
+!.opencode/agents/upset-alert-updater.md

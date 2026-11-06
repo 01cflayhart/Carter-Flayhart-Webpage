@@ -47,4 +47,5 @@ jobs:
             git commit -m 'Refresh SciX publication list and citation counts'
             git push
             gh workflow run pages.yml --ref main
+            gh workflow run cloudflare.yml --ref main
           fi

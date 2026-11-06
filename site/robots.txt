@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /private
+Disallow: /api/
+Sitemap: https://carterflayhart.pages.dev/sitemap.xml

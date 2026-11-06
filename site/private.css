@@ -1,0 +1,17 @@
+main { width: min(900px, calc(100% - 32px)); margin: 40px auto; padding: clamp(20px, 5vw, 48px); background: var(--paper); overflow-wrap: anywhere; }
+h1 { margin-block: 24px; }
+h2 { margin-block: 36px 12px; }
+p { max-width: 70ch; }
+.setup-checks { list-style: none; padding: 0; margin-block: 16px 24px; }
+.setup-checks li { padding-block: 16px; border-bottom: 1px solid var(--line); }
+.setup-checks strong { display: block; color: var(--accent); }
+.setup-checks p { color: var(--muted); margin-block: 6px 0; }
+.table-wrap { overflow-x: auto; margin-block: 24px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+button { font: inherit; min-height: 44px; padding: 10px 16px; background: var(--paper); color: var(--ink); border: 1px solid var(--line); cursor: pointer; }
+button:hover { background: #3a4a56; }
+button:disabled { opacity: .6; cursor: wait; }
+input { accent-color: var(--accent); }
+::selection { background: var(--accent); color: #151d27; }
+* { scrollbar-color: #84969f var(--paper); }

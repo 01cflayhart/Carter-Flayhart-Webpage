@@ -4,12 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#151d27">
-  <meta name="description" content="Carter Flayhart's tennis project: separate ATP and WTA power rankings, recent form, and surface ratings.">
-  <title>Sports Analysis — Carter Flayhart</title>
+  <meta name="description" content="Carter Flayhart's sports analysis hub: separate ATP and WTA tennis power rankings, plus experimental NFL props and favorite-risk tools with transparent coverage.">
+  <title>Sports Analysis Hub — Carter Flayhart</title>
   <link rel="stylesheet" href="../site.css">
+  <link rel="stylesheet" href="./tools.css">
+  <script src="./feedback.js" defer></script>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <script src="../site.js" defer></script>
   <script src="./sports.js" defer></script>
+  <script src="../analytics.js" defer></script>
+  <link rel="canonical" href="https://carterflayhart.pages.dev/sports/">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -24,22 +28,28 @@
       </div>
     </header>
     <nav class="section-nav" aria-label="Main navigation">
-      <a href="../#about">About Me</a><a href="../#research">Research</a><a href="../#publications">Publications</a><a href="../#talks">Talks &amp; Conferences</a><a href="./" aria-current="page">Sports Analysis</a><a href="../#hobbies">Hobbies</a><a href="../assets/carter-flayhart-cv.pdf" target="_blank" rel="noopener" aria-label="CV (PDF, opens in a new tab)">CV</a><a href="../#contact">Contact</a>
+      <a href="../#about">About Me</a><a href="../#research">Research</a><a href="../#publications">Publications</a><a href="../#talks">Talks &amp; Conferences</a><a href="../#hobbies">Hobbies</a><a href="./" aria-current="page">Sports Analysis Hub</a><a href="../assets/carter-flayhart-cv.pdf" target="_blank" rel="noopener" aria-label="CV (PDF, opens in a new tab)">CV (PDF ↗)</a><a href="../#contact">Contact</a>
     </nav>
     <main id="main" tabindex="-1">
       <section class="content-section" aria-labelledby="sports-title">
-        <h2 id="sports-title">Sports Analysis</h2>
+        <h2 id="sports-title">Sports Analysis Hub</h2>
+        <p>Independent models. Open methods. A record of what worked—and what didn’t.</p>
+        <div class="tool-directory">
+          <article class="tour-entry"><h3><a href="./prop-hunt/">Prop Hunt</a></h3><p>Find the opportunity hiding in the stat line. NFL value props and a separate high-consistency watchlist, with sportsbook-specific odds and projected likelihoods.</p><p class="editorial-note">Experimental · NFL first · Live inputs awaiting connection</p></article>
+          <article class="tour-entry"><h3><a href="./upset-alert/">🔔 Upset Alert</a></h3><p>How vulnerable is the favorite? A daily look at heavy moneyline favorites in NFL, NCAAF, NCAAB and tennis.</p><p class="editorial-note">Experimental · No NBA or MLB · Live inputs awaiting connection</p></article>
+        </div>
         <p class="opening">Tennis: Court Current</p>
         <p>The official rankings tell one story. I wanted to look more closely at recent form, the quality of a player’s opponents, and how results differ by surface.</p>
-        <p>Court Current is my attempt at that. ATP and WTA are rated separately, and each player has a notebook showing the results behind their ranking. Each dashboard also has a searchable published-ranking table: <a href="./tennis/?tour=ATP#published-rankings">ATP standings via ESPN</a> and <a href="./tennis/?tour=WTA#published-rankings">official WTA standings</a>, checked daily.</p>
+        <p>Court Current is my attempt at that. ATP and WTA are rated separately, and each player has a notebook showing the results behind their ranking. Each dashboard also has a searchable published-ranking table: <a href="./tennis/?tour=ATP#published-rankings">ATP standings</a> and <a href="./tennis/?tour=WTA#published-rankings">WTA standings</a> via TennisONE, checked daily.</p>
         <div class="tour-list">
           <article class="tour-entry"><h3>ATP singles</h3><p>Men’s overall and surface power rankings.</p><div class="tour-stat" id="ATP-status">Open the rankings for source coverage.</div><a href="./tennis/?tour=ATP">View ATP rankings <span aria-hidden="true">→</span></a></article>
           <article class="tour-entry"><h3>WTA singles</h3><p>Women’s overall and surface power rankings.</p><div class="tour-stat" id="WTA-status">Open the rankings for source coverage.</div><a href="./tennis/?tour=WTA">View WTA rankings <span aria-hidden="true">→</span></a></article>
         </div>
         <aside class="coverage-note"><h3>A note on the data</h3><p>This is an ongoing project, not an official ranking. Coverage is incomplete, and the model is provisional. The dashboards include the latest accepted results, source information, methods, and known gaps.</p><p>Results: <a href="https://www.valuebetennis.com/donnees.htm">Valuebetennis</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>). Official references: <a href="https://www.atptour.com/en/rankings/singles">ATP rankings</a> and <a href="https://www.wtatennis.com/rankings/singles">WTA rankings</a>.</p></aside>
+        <section class="feedback-section" aria-labelledby="feedback-title"><h3 id="feedback-title">Help improve the hub</h3><p>Found a data issue or have a suggestion? Feedback is sent privately to Carter, not posted publicly.</p><form id="hub-feedback"><label>Your email (optional)<input name="email" type="email" maxlength="254" autocomplete="email"></label><label>Feedback<textarea name="message" required minlength="10" maxlength="4000" rows="5"></textarea></label><label class="bot-trap" aria-hidden="true">Leave this blank<input name="website" tabindex="-1" autocomplete="off"></label><button type="submit">Send feedback</button><p id="feedback-status" role="status"></p></form><p class="editorial-note">If sending is unavailable, <a href="mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback">email Carter directly</a>.</p></section>
       </section>
     </main>
-    <footer><span>© 2026 Carter Flayhart</span><a href="https://github.com/01cflayhart/Carter-Flayhart-Webpage">Website source</a></footer>
+    <footer><span>© 2026 Carter Flayhart · <a href="../privacy.html">Privacy &amp; activity tracking</a></span><a href="https://github.com/01cflayhart/Carter-Flayhart-Webpage">Website source</a></footer>
   </div>
   <p class="background-credit">COSMOS-Web background: <a href="https://esawebb.org/images/potm2504a/">ESA/Webb, NASA &amp; CSA, G. Gozaliasl, A. Koekemoer, M. Franco, and the COSMOS-Web team</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · Cropped and darkened for readability.</p>
 </body>

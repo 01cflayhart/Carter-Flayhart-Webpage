@@ -31,6 +31,7 @@ h1 a { color: var(--ink); text-decoration: none; }
 .section-nav a[aria-current] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
 main { padding: 34px 48px 42px; min-height: 310px; }
 .content-section { max-width: 760px; scroll-margin-top: 24px; }
+:target { scroll-margin-top: calc(var(--profile-height, 230px) + 120px); }
 .content-section + .content-section { margin-top: 48px; }
 .enhanced .content-section { margin-top: 0; }
 h2 { font: normal 1.85rem/1.3 var(--serif); margin: 0 0 22px; letter-spacing: -.02em; }
@@ -80,7 +81,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8p
 .coverage-note { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .82rem; color: var(--muted); }
 @media (min-width: 761px) and (min-height: 650px) {
   .profile-header { position: sticky; top: 0; z-index: 3; }
-  .section-nav { position: sticky; top: var(--profile-height, 230px); z-index: 3; }
+  .section-nav { position: sticky; top: calc(var(--profile-height, 230px) - 1px); z-index: 4; box-shadow: 0 -2px 0 var(--paper); }
 }
 @media (max-width: 760px) {
   .site-shell { width: calc(100% - 28px); margin-top: 24px; }

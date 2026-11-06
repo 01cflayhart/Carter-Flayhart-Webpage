@@ -48,6 +48,7 @@ jobs:
             git pull --rebase origin main
             git push
             gh workflow run pages.yml --ref main
+            gh workflow run cloudflare.yml --ref main
           fi
       - name: Report CV refresh failure
         if: steps.cv.outcome == 'failure'

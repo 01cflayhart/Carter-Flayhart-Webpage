@@ -8,14 +8,22 @@ from .server import Application
 from .update import ROOT, atomic_json
 
 
-def export(root=ROOT, output=None):
+def export_assets(root=ROOT, output=None, require_data=True):
     root=Path(root);out=Path(output) if output else root/'_site'
+    if require_data and any(not (out/'sports'/'tennis'/'data'/tour/'meta.json').is_file() for tour in ('ATP','WTA')):
+        raise ValueError('Assets-only refresh requires an existing ATP/WTA export; run python -m tennis.export first')
     # Copy only public website assets. Never publish the project/data directory.
     shutil.copytree(root/'site',out,dirs_exist_ok=True)
     tennis=out/'sports'/'tennis'
     shutil.copytree(root/'web',tennis,dirs_exist_ok=True)
     (out/'.nojekyll').touch()
     (tennis/'runtime.js').write_text('window.COURT_STATIC = true;\n')
+    return out
+
+
+def export(root=ROOT, output=None):
+    root=Path(root);out=export_assets(root,output,require_data=False)
+    tennis=out/'sports'/'tennis'
     for tour in ('ATP','WTA'):
         app=Application(root,'data/current/'+tour)
         snapshot,players=app.load()
@@ -43,4 +51,9 @@ def export(root=ROOT, output=None):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output')
-    args=parser.parse_args();export(output=args.output)
+    parser.add_argument('--assets-only',action='store_true',help='Refresh static assets using existing exported ATP/WTA data; no model rebuild')
+    args=parser.parse_args()
+    if args.assets_only:
+        print('Static assets refreshed: '+str(export_assets(output=args.output)),flush=True)
+    else:
+        export(output=args.output)

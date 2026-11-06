@@ -5,6 +5,9 @@
   "description": "Optional browser verification tools; the application itself runs on Python's standard library.",
   "scripts": {
     "test": "playwright test",
+    "test:pages": "node scripts/verify-pages.cjs",
+    "test:security": "node --test tests/security.test.mjs",
+    "test:cloudflare": "node scripts/test-cloudflare.cjs",
     "test:python": "python3 -m unittest discover -v"
   },
   "devDependencies": {

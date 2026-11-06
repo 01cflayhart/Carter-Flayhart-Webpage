@@ -1,10 +1,17 @@
 // Keep the sticky navigation aligned even when fonts, zoom, or text size change.
 const profile = document.querySelector('.profile-header');
 if (profile) new ResizeObserver(() => {
-  document.documentElement.style.setProperty('--profile-height', profile.offsetHeight + 'px');
+  document.documentElement.style.setProperty('--profile-height', profile.getBoundingClientRect().height + 'px');
 }).observe(profile);
 
 // Real hash links keep sections shareable. Without JS, all sections remain readable.
+// The tab is only offered after server-side owner authorization. The endpoint itself
+// still checks authentication; hiding a tab is never the security boundary.
+fetch('/api/owner/session').then(r => r.ok ? r.json() : null).then(data => {
+  if (!data?.owner) return;
+  const nav = document.querySelector('.section-nav');
+  if (nav) { const link = document.createElement('a'); link.href = '/private'; link.textContent = 'Site activity (private)'; nav.append(link); }
+}).catch(() => {});
 const sections = [...document.querySelectorAll('.content-section[id]')];
 const links = [...document.querySelectorAll('.section-nav a[href^="#"]')];
 
