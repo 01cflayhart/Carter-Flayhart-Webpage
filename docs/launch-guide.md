@@ -1,8 +1,8 @@
 # Remaining launch steps: Google sitemap fetch and Bing verification
 
-**Your next actions are account-side: test Google's fetch of `sitemap.xml`, then click Verify in Bing after the agent confirms publication. No file copying, terminal commands or Git push are needed from you.**
+**Your next actions are account-side: test Google's fetch of `sitemap.xml`, then click Verify in Bing. Its XML file is already live and checked; no waiting, file copying, terminal commands or Git push are needed from you.**
 
-Google ownership, home-page indexing, feedback inbox delivery and the GitHub profile link are already confirmed. Do not repeat their setup. Bing import did not offer the site; you have already added it manually and supplied its XML file. The agent copied `BingSiteAuth.xml` unchanged from Downloads into `site/`, preserving the original, and is handling the commit/deployment/live check.
+Google ownership, home-page indexing, feedback inbox delivery and the GitHub profile link are already confirmed. Do not repeat their setup. Bing import did not offer the site; you have already added it manually and supplied its XML file. The agent copied `BingSiteAuth.xml` unchanged from Downloads into `site/`, preserving the original, committed/pushed it and [deployed it successfully](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42313475365). Live checks confirmed direct HTTP 200 without login/redirect and byte-for-byte identity with Downloads.
 
 Keep both verification files permanently (`site/google5f578c920a2f92ee.html` and `site/BingSiteAuth.xml`) and the Google exact-URL handler. Do not recreate properties, API tokens, OAuth apps, databases or hosting. Retain the original GitHub Pages hosting during the transition. The Resend sender is still a sandbox/test sender, not proof of approval for ongoing production use; the free [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) remains available. No further email tests are needed.
 
@@ -55,7 +55,7 @@ Google documents transient fetch errors and retry attempts over a few days; that
 
 ## 2. Bing: verify the existing manually added site
 
-**Do not retry Google import or add another copy of the site.** You have already completed manual addition. The agent is publishing your supplied file at:
+**Do not retry Google import or add another copy of the site.** You have already completed manual addition. Your supplied file is published and independently checked at:
 
 **[https://carterflayhart.pages.dev/BingSiteAuth.xml](https://carterflayhart.pages.dev/BingSiteAuth.xml)**
 
@@ -63,7 +63,7 @@ Google documents transient fetch errors and retry attempts over a few days; that
 
 1. Return to the Bing tab that provided **BingSiteAuth.xml**. If closed, open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)**, sign into the same account and select the existing **`https://carterflayhart.pages.dev/`** site that still needs verification.
 2. Return to its verification panel / XML file verification method if needed. You do not need another download or a new verification method.
-3. Once the agent confirms publication, open **[BingSiteAuth.xml](https://carterflayhart.pages.dev/BingSiteAuth.xml)**. It should be public without login and contain a `<users>` element with a `<user>` verification value. The browser's “no style information” message is also normal here. The agent checks its bytes against the Downloads original; do not edit it.
+3. Open **[BingSiteAuth.xml](https://carterflayhart.pages.dev/BingSiteAuth.xml)**. It is public without login and contains a `<users>` element with a `<user>` verification value. The browser's “no style information” message is also normal here. The agent has checked its bytes against the Downloads original; do not edit it.
 4. In **Bing's verification panel**, click **Verify**. Opening the XML itself does not complete the account-side verification.
 5. Wait for successful verification / access to the site's dashboard. If Bing fails, share its exact error; do not change DNS for `pages.dev`, replace a working verification file or add the site again.
 
