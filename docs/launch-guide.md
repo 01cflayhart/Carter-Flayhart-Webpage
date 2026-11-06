@@ -2,7 +2,7 @@
 
 **Your next manual action is clicking Verify in Google Search Console. No file moving, terminal commands or Git push is needed from you.**
 
-The agent copied `google5f578c920a2f92ee.html` byte-for-byte from Downloads into `site/`, leaving the original intact, and is handling publication. Your verification URL is:
+The agent copied `google5f578c920a2f92ee.html` byte-for-byte from Downloads into `site/`, left the original intact, committed/pushed it, and [deployed it successfully](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/runs/42308201453). The exact URL below has been checked live: HTTP 200, no redirect or login, and unchanged content. Your verification URL is:
 
 **<https://carterflayhart.pages.dev/google5f578c920a2f92ee.html>**
 
@@ -28,7 +28,7 @@ Remaining work:
    google-site-verification: google5f578c920a2f92ee.html
    ```
 
-   If publication is still finishing and the URL returns 404, wait for the newest **[Cloudflare deployment](https://github.com/01cflayhart/Carter-Flayhart-Webpage/actions/workflows/cloudflare.yml)** to complete, then refresh. The agent is handling this deployment; do not copy the file again or change its contents.
+   Publication and the exact URL have already been verified by the agent. Do not copy the file again, rename it or change its contents. If your browser unexpectedly shows a different result, share that error before changing the setup.
 5. In Google's verification panel, click **Verify**.
 6. Wait for **Ownership verified**, then click **Go to property** if offered.
 
