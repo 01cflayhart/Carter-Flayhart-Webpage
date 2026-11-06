@@ -1,66 +1,81 @@
-# Remaining launch steps: sitemap follow-up and Bing
+# Remaining launch steps: Google sitemap fetch and Bing verification
 
-**Google ownership and the home page's inclusion in Google are confirmed by Carter. The public GitHub profile now links to the website (independently verified). No further ownership verification, GitHub profile editing or home-page indexing request is needed.**
+**Your next actions are account-side: test Google's fetch of `sitemap.xml`, then click Verify in Bing after the agent confirms publication. No file copying, terminal commands or Git push are needed from you.**
 
-Your remaining Google issue is the sitemap's **Couldn't fetch** status. It does not mean the already-indexed home page has disappeared from Google. The agent has checked the live sitemap: GET and HEAD return HTTP 200 directly, Content-Type is `application/xml`, its XML/namespace and five canonical URLs are valid, and `robots.txt` permits Googlebot access and advertises the correct sitemap. No website-side fetch/format defect has been identified. Google's exact error details are needed before choosing a fix; a successful request from the agent does not prove Google's fetch succeeded.
+Google ownership, home-page indexing, feedback inbox delivery and the GitHub profile link are already confirmed. Do not repeat their setup. Bing import did not offer the site; you have already added it manually and supplied its XML file. The agent copied `BingSiteAuth.xml` unchanged from Downloads into `site/`, preserving the original, and is handling the commit/deployment/live check.
 
-**Do not recreate properties, verification files, tokens, OAuth apps, hosting, databases or email keys. Keep the Google verification file and its exact-URL handler permanently, and retain the original GitHub Pages hosting during the transition.** Email receipt is already confirmed; no more feedback tests are needed. The Resend sender is still a sandbox/test sender, not proof of production-sender approval; the free [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) remains available.
+Keep both verification files permanently (`site/google5f578c920a2f92ee.html` and `site/BingSiteAuth.xml`) and the Google exact-URL handler. Do not recreate properties, API tokens, OAuth apps, databases or hosting. Retain the original GitHub Pages hosting during the transition. The Resend sender is still a sandbox/test sender, not proof of approval for ongoing production use; the free [direct email fallback](mailto:carter.flayhart@gmail.com?subject=Sports%20Analysis%20Hub%20feedback) remains available. No further email tests are needed.
 
 Remaining work:
 
-- [ ] 1. Inspect and resolve Google's sitemap fetch status.
-- [ ] 2. Add/import the site into Bing and submit the sitemap. You can do this while Google retries.
-- [ ] 3. Optionally connect sportsbook prices. Validated prediction models remain separate engineering work.
+- [ ] 1. Get Google's live sitemap fetch result and resolve its report status.
+- [ ] 2. Click Bing Verify, then submit/check its sitemap.
+- [ ] 3. Optionally connect sportsbook prices. Validated predictions remain separate engineering work.
 
-No terminal commands or Git push are needed from you for these steps.
+## 1. Google: test the sitemap itself, not the home page
 
-## 1. Google: inspect the sitemap fetch failure — web browser
+### What the browser's XML message means
 
-### 1A. Get the exact submitted URL and detailed error
+**“This XML file does not appear to have any style information associated with it” is normal. It is not a fetch error.** Sitemaps are machine-readable XML, not styled web pages. The five URLs you saw are the expected sitemap. Do not add a stylesheet, turn it into HTML, rename it, or change the hosting to remove that browser message.
 
-1. Open **[Search Console → Sitemaps for this website](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. Confirm the property selector says **`https://carterflayhart.pages.dev/`**.
-2. Click the actual sitemap row showing **Couldn't fetch**. Do not stop at the summary table.
-3. In the details page, copy the **complete Sitemap URL**. It must be exactly:
+Your submitted URL is now confirmed as correct: **[https://carterflayhart.pages.dev/sitemap.xml](https://carterflayhart.pages.dev/sitemap.xml)**. The agent rechecked public GET and HEAD: HTTP 200 without redirects, `application/xml`, unchanged valid XML, five unique canonical URLs, and Googlebot access permitted by `robots.txt`. **This proves current public availability—not that Google fetched it successfully.** The cause of Google's earlier **Couldn't fetch** remains unconfirmed.
+
+### 1A. Use Google's live test for this exact XML URL
+
+1. Open **[Search Console for this website](https://search.google.com/search-console?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. Confirm the property selector is **`https://carterflayhart.pages.dev/`**.
+2. In the top **Inspect any URL** field, paste exactly:
 
    ```text
    https://carterflayhart.pages.dev/sitemap.xml
    ```
 
-   It must not have a trailing slash after `.xml`, a duplicated website prefix, the old GitHub Pages hostname, or an extra folder. The [correct public sitemap](https://carterflayhart.pages.dev/sitemap.xml) is currently accessible without a login.
-4. Click/expand **Sitemap could not be read** or the error shown there. Record the detailed reason/HTTP code, if any, and the **Last read** value (including if it is blank).
-5. Send the agent the complete submitted URL and expanded error text, or a cropped screenshot of that details section. Do not include passwords, cookies or API keys. The agent cannot inspect this private Google report through the current connection.
+3. Press Enter, then click **Test live URL**. This is a different URL from your already-successful home-page test.
+4. Expand **Page availability** / crawl details in the live-test result. Find **Crawl allowed?** and **Page fetch**. Google's [official sitemap troubleshooting instructions](https://support.google.com/webmasters/answer/7451001#fetch_errors) recommend these checks.
+5. Tell the agent both values:
+   - Expected **Crawl allowed? → Yes**.
+   - Expected **Page fetch → Successful**.
+   - If either fails, share the exact detailed error/HTTP code or a cropped screenshot. That evidence is needed to choose a fix; a generic **Couldn't fetch** status alone cannot identify the cause.
 
-If the submitted URL is wrong, add the exact correct URL using **Add a new sitemap** on the report page. If the form already prints the site prefix, enter **`sitemap.xml`** only; otherwise paste the full URL above. Submit once. Do not delete the property or change the actual sitemap file to match a mistyped URL. An obsolete, wrong submission can be removed from the report later without deleting the site/property.
+**Do not click Request indexing for the XML file.** It is not a search-results page. Ignore a general “not indexed” result for the sitemap when troubleshooting its *fetch*; focus on the crawl/fetch details. Your home page already reports **URL is on Google**, so no further home-page indexing requests are needed either.
 
-### 1B. Test Google's fetch of the sitemap itself
+### 1B. Update the sitemap report only after the fetch test
 
-This is different from the home-page test you already completed. Google's [official sitemap troubleshooting instructions](https://support.google.com/webmasters/answer/7451001#fetch_errors) recommend this check.
+1. Open **[Search Console → Sitemaps](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)** and click the existing failed sitemap row.
+2. **Stay on Google's report page to inspect errors.** **Open Sitemap** only opens the public XML in your browser; it does not display Google's fetch diagnostics or fix its status.
+3. Record **Last read** (including if blank) and click/expand **Sitemap could not be read** or the displayed error if the report offers details. If there are no further details, say so; do not hunt for a nonexistent control. A cropped screenshot of that report is useful.
+4. If **Page fetch is Successful** in Step 1A and the sitemap report still says **Couldn't fetch**, return to the Sitemaps list and submit the same correct URL **once**:
+   - If the site prefix is already printed before the input, type **`sitemap.xml`** only.
+   - If it asks for a complete URL, paste **`https://carterflayhart.pages.dev/sitemap.xml`**.
+   - Click **Submit**, then allow time for Google's report to update. Do not delete/recreate the property or repeatedly submit the URL.
+5. If the report already says **Success**, stop; no resubmission is needed. If Google's live fetch fails, share that failure first rather than resubmitting blindly. If a successful live fetch is followed by continuing report failures, share the error/Last read with the agent.
 
-1. In Search Console's top **Inspect any URL** field, paste **`https://carterflayhart.pages.dev/sitemap.xml`** and press Enter.
-2. Choose **Test live URL**.
-3. Expand **Page availability** or the crawl/fetch details. Look specifically for:
-   - **Crawl allowed? → Yes**
-   - **Page fetch → Successful**
-4. If either fails, share the detailed error with the agent. That is stronger diagnostic evidence than the summary **Couldn't fetch** label.
-5. If Google's live sitemap fetch succeeds, return to **[Sitemaps](https://search.google.com/search-console/sitemaps?resource_id=https%3A%2F%2Fcarterflayhart.pages.dev%2F)**. If it is still failed, submit the exact same correct sitemap URL **once** to ask Google to fetch it again, then allow time for the report to update. If it now says **Success**, stop; do not resubmit.
-6. If the report remains failed, share its detailed error and Last read rather than repeatedly resubmitting. Google's documentation says transient fetch errors can occur and it retries failed sitemaps for a few days; the cause here has not been established, so no guaranteed completion/reset time is claimed.
+Google documents transient fetch errors and retry attempts over a few days; that is a possibility, not a proven explanation here. No exact reset/completion time is guaranteed. Do not bypass quotas, disable security controls, or create alternate properties/accounts. **You may complete Bing while Google retries.**
 
-**Do not select Request indexing for `sitemap.xml`.** It is an XML discovery file, not a page that needs to appear in search results. Your home page already reports **URL is on Google**, so it also needs no more manual indexing requests. The earlier request quota is no longer a task to resolve.
+**Done when:** Google's sitemap report says **Success**. Ownership and home-page indexing do not need to be repeated while resolving this separate report.
 
-**Done when:** the sitemap report says **Success**. You can continue with Bing while this is being diagnosed. Do not disable security controls, create alternate Google accounts/properties, rename the working sitemap, or recreate hosting merely to try to clear this status.
+## 2. Bing: verify the existing manually added site
 
-## 2. Add the site to Bing — web browser
+**Do not retry Google import or add another copy of the site.** You have already completed manual addition. The agent is publishing your supplied file at:
 
-You have not started Bing yet. It is independent of the remaining Google sitemap error; verified Google ownership is sufficient for attempting import.
+**[https://carterflayhart.pages.dev/BingSiteAuth.xml](https://carterflayhart.pages.dev/BingSiteAuth.xml)**
 
-1. Open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)** and sign in with your chosen account.
-2. If offered, choose **Import from Google Search Console**. Complete Google's authorization yourself, select **`https://carterflayhart.pages.dev/`**, and finish the import. An additional Google indexing request is not required.
-3. If import is unavailable or you prefer not to authorize it, choose **Add site** / manual addition and enter **`https://carterflayhart.pages.dev/`**.
-4. For manual verification, choose Bing's **XML file** method and download **`BingSiteAuth.xml`** (or its exact provided filename). Leave it unchanged in Downloads and tell the agent where it is. The agent can copy, commit, publish and check it. **Do not press Verify until the agent confirms the file is public.** Then return to Bing and click **Verify**. Do not add DNS records for `pages.dev` or a domain you do not own.
-5. Select the verified site in Bing. Open **Sitemaps** in its sidebar, click **Submit sitemap**, and enter **`https://carterflayhart.pages.dev/sitemap.xml`**. If import already added it successfully, do not duplicate it. If Bing also reports a fetch error, send the exact URL and details to the agent rather than changing the site speculatively.
-6. If Bing offers **URL submission** or an indexing request, submit **`https://carterflayhart.pages.dev/`** once. Bing indexing can take time.
+### 2A. Click Verify in Bing
 
-**Done when:** Bing recognizes you as a verified owner and lists the sitemap successfully. Sign-in, Google-import consent and account-side verification require you; the agent can handle supplied public verification files and website-side troubleshooting.
+1. Return to the Bing tab that provided **BingSiteAuth.xml**. If closed, open **[Bing Webmaster Tools](https://www.bing.com/webmasters/)**, sign into the same account and select the existing **`https://carterflayhart.pages.dev/`** site that still needs verification.
+2. Return to its verification panel / XML file verification method if needed. You do not need another download or a new verification method.
+3. Once the agent confirms publication, open **[BingSiteAuth.xml](https://carterflayhart.pages.dev/BingSiteAuth.xml)**. It should be public without login and contain a `<users>` element with a `<user>` verification value. The browser's “no style information” message is also normal here. The agent checks its bytes against the Downloads original; do not edit it.
+4. In **Bing's verification panel**, click **Verify**. Opening the XML itself does not complete the account-side verification.
+5. Wait for successful verification / access to the site's dashboard. If Bing fails, share its exact error; do not change DNS for `pages.dev`, replace a working verification file or add the site again.
+
+### 2B. Submit the sitemap and optionally the home page
+
+1. With the verified site selected in **[Bing Webmaster Tools](https://www.bing.com/webmasters/)**, open **Sitemaps** in its sidebar.
+2. Click **Submit sitemap** and enter **`https://carterflayhart.pages.dev/sitemap.xml`**. If that exact sitemap is already listed successfully, do not duplicate it.
+3. Confirm submission is listed, then check its processing status. If Bing reports a fetch error, share the complete URL and detailed error with the agent. Browser access alone does not confirm Bing's fetch.
+4. If Bing offers **URL submission** / **Submit URLs**, submit **`https://carterflayhart.pages.dev/`** once. This is optional; sitemap submission also supports discovery. Indexing can take time and is not guaranteed.
+5. Tell the agent the **ownership verification result** and **sitemap status**, or provide a cropped screenshot. The agent cannot inspect your private Bing account through the current connection.
+
+**Done when:** Bing confirms ownership and lists the sitemap successfully. Keep `BingSiteAuth.xml` published afterward; do not delete it once verified.
 
 ## 3. Optional: connect sportsbook prices, not validated predictions
 
