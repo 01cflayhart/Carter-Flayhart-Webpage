@@ -1,7 +1,7 @@
 {
   "query": "author:\"Carter Flayhart\"",
   "source": "https://scixplorer.org/search?q=author%3A%22Carter+Flayhart%22&sort=citation_count+desc",
-  "checked_at": "2026-11-06T15:52:25.174191+00:00",
+  "checked_at": "2026-11-07T14:51:46.490876+00:00",
   "records": [
     {
       "bibcode": "2024hst..prop17802K",
@@ -269,7 +269,7 @@
         "PUB_OPENACCESS",
         "REFEREED"
       ],
-      "citation_count": 135
+      "citation_count": 136
     },
     {
       "bibcode": "2025MsT.........14F",
